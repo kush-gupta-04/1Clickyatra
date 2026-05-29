@@ -8,6 +8,12 @@ import {
 import Navbar from "./component/Layout/Navbar";
 import "./App.css";
 
+import Home from "./pages/Home.jsx";
+import Packages from "./pages/Packages.jsx";
+import Blogs from "./pages/Blogs.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+
 function App() {
   const [count, setCount] = useState(0);
 
@@ -15,6 +21,21 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen bg-luxury-dark text-slate-100 font-sans selection:bg-primary selection:text-luxury-dark">
         <Navbar />
+
+        {/* Page Content */}
+        <main className="flex-grow">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/packages" element={<Packages />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+
+            {/* Fallback Catch-all Route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );

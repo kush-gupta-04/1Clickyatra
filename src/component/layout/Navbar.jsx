@@ -24,6 +24,14 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Explore Tours", path: "/packages" },
+    { name: "Travel Blog", path: "/blogs" },
+    { name: "About Us", path: "/about" },
+    { name: "Contact", path: "/contact" },
+  ];
+
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 border-b ${
@@ -42,6 +50,23 @@ const Navbar = () => {
                 1Click<span className="text-primary">yatra</span>
               </span>
             </Link>
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex space-x-7">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${
+                  location.pathname === link.path
+                    ? "text-primary"
+                    : "text-slate-600"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
