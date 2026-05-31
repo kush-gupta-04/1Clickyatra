@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./component/layout/Navbar";
 import "./App.css";
+import WhatsAppCTA from "./component/layout/WhatsappCTA.jsx";
 
 import Home from "./pages/Home.jsx";
 import Packages from "./pages/Packages.jsx";
@@ -36,6 +37,9 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+
+        {/* WhatsApp Call To Action */}
+        <WhatsAppCTA />
       </div>
     </Router>
   );
