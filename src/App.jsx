@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Navbar from "./component/layout/Navbar";
+import Footer from "./component/layout/Footer.jsx";
 import "./App.css";
 import WhatsAppCTA from "./component/layout/WhatsappCTA.jsx";
 
@@ -40,6 +41,9 @@ function App() {
 
         {/* WhatsApp Call To Action */}
         <WhatsAppCTA />
+
+        {/* Footer */}
+        <Footer />
       </div>
     </Router>
   );
