@@ -132,7 +132,7 @@ const Contact = () => {
                       placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary shadow-sm"
+                      className=" placeholder:text-blue-600/50 w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary shadow-sm"
                     />
                   </div>
                   <div>
@@ -145,7 +145,7 @@ const Contact = () => {
                       placeholder="john@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary shadow-sm"
+                      className="placeholder:text-blue-600/50  bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-950 focus:outline-none focus:border-primary shadow-sm"
                     />
                   </div>
                 </div>
@@ -157,10 +157,10 @@ const Contact = () => {
                   <input
                     type="text"
                     required
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+91 11-41044511"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary shadow-sm"
+                    className="placeholder:text-blue-600/50 w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary shadow-sm"
                   />
                 </div>
 
@@ -174,7 +174,7 @@ const Contact = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     rows={4.5}
-                    className="w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary resize-none shadow-sm"
+                    className="placeholder:text-blue-600/50 w-full bg-white border border-slate-200 rounded-md py-2.5 px-3.5 text-xs font-semibold text-slate-850 focus:outline-none focus:border-primary resize-none shadow-sm"
                   ></textarea>
                 </div>
 
