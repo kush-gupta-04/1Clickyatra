@@ -11,14 +11,14 @@ const About = () => {
         <div className="my-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-5">
             <span className="text-primary text-xs uppercase tracking-widest font-bold">
-              The 1ClickTravel Story
+              The 1Clickyatra Story
             </span>
             <h1 className="font-serif text-3xl sm:text-4xl font-extrabold text-slate-800 leading-tight">
               Crafting Extraordinary <br />
               <span className="text-primary">Luxury Escapes</span> Since 2012
             </h1>
-            <p className="text-slate-650 text-xs sm:text-sm leading-relaxed font-semibold">
-              At 1ClickTravel, we believe travel is not just about changing
+            <p className="text-slate-500 text-xs leading-relaxed font-semibold">
+              At 1Clickyatra, we believe travel is not just about changing
               locations; it is about changing perspectives. For over a decade,
               we have curated high-end bespoke holiday paths for travelers who
               value service quality, comfort, and authenticity.

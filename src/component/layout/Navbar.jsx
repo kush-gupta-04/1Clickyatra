@@ -1,6 +1,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import Login from "../../pages/Login";
+import Register from "../../pages/Register";
 import {
   Menu,
   X,
@@ -154,13 +156,13 @@ const Navbar = () => {
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
-                  to="/login"
+                  to="/Login"
                   className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
+                  to="/Register"
                   className="inline-flex items-center justify-center px-4.5 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-dark transition-colors duration-200 rounded-md shadow-sm"
                 >
                   Sign Up

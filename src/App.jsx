@@ -5,16 +5,22 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+
+import "./App.css";
+
+//Layout Component
 import Navbar from "./component/layout/Navbar";
 import Footer from "./component/layout/Footer.jsx";
-import "./App.css";
 import WhatsAppCTA from "./component/layout/WhatsappCTA.jsx";
 
+//Pages
 import Home from "./pages/Home.jsx";
 import Packages from "./pages/Packages.jsx";
 import Blogs from "./pages/Blogs.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
+import Login from "./pages/Register.jsx";
+import Register from "./pages/Register.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -33,6 +39,8 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             {/* Fallback Catch-all Route */}
             <Route path="*" element={<Navigate to="/" replace />} />
