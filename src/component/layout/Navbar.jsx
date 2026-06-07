@@ -157,13 +157,13 @@ const Navbar = () => {
               <div className="flex items-center space-x-4">
                 <Link
                   to="/Login"
-                  className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors duration-200"
+                  className="text-sm font-semibold text-slate-600 hover:text-primary hover:scale-110 transition-colors duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/Register"
-                  className="inline-flex items-center justify-center px-4.5 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-dark transition-colors duration-200 rounded-md shadow-sm"
+                  className="inline-flex items-center justify-center px-4.5 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-dark hover:scale-110 transition-colors duration-200 rounded-md shadow-sm"
                 >
                   Sign Up
                 </Link>
