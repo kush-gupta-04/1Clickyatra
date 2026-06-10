@@ -135,7 +135,7 @@ const Login = () => {
       </div>
 
       {/* Right side: Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-30 bg-white">
+      <div className="w-full lg:w-1/2  flex items-center justify-center px-6 py-30 bg-white">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-2">
             <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">

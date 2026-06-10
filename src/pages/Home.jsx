@@ -17,6 +17,33 @@ const Home = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [durationFilter, setDurationFilter] = useState("");
 
+  const destinations = [
+    {
+      name: "Maldives",
+      image:
+        "https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?auto=format&fit=crop&q=80&w=400",
+      count: 12,
+    },
+    {
+      name: "Switzerland",
+      image:
+        "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?auto=format&fit=crop&q=80&w=400",
+      count: 8,
+    },
+    {
+      name: "Indonesia",
+      image:
+        "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=400",
+      count: 15,
+    },
+    {
+      name: "Tanzania",
+      image:
+        "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=400",
+      count: 6,
+    },
+  ];
+
   const handleSearch = (e) => {
     e.preventDefault();
     let queryParams = [];
@@ -117,6 +144,48 @@ const Home = () => {
           </form>
         </div>
       </div>
+
+      {/* 2. Popular Destinations */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-primary text-xs uppercase tracking-widest font-bold">
+              Dream Escapes
+            </span>
+            <h2 className="font-serif text-3xl font-extrabold mt-1 text-slate-800">
+              Popular Destinations
+            </h2>
+            {
+              <div className="w-12 h-1 bg-primary mx-auto mt-3 rounded-full"></div>
+            }
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {destinations.map((dest, idx) => (
+              <div
+                key={idx}
+                onClick={() => navigate(`/packages?search=${dest.name}`)}
+                className="group relative rounded-lg overflow-hidden h-64 cursor-pointer border border-slate-200/60 hover:border-slate-300 transition-all duration-200 shadow-sm"
+              >
+                <img
+                  src={dest.image}
+                  alt={dest.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-103"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent"></div>
+                <div className="absolute bottom-5 left-5">
+                  <h3 className="font-serif text-lg font-bold text-white tracking-wide">
+                    {dest.name}
+                  </h3>
+                  <p className="text-xs text-primary-light mt-0.5 font-semibold">
+                    {dest.count} Vacation Tours
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
