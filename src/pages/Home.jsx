@@ -12,6 +12,8 @@ import {
   Check,
 } from "lucide-react";
 
+import { useNavigate, Link } from "react-router-dom";
+
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -183,6 +185,52 @@ const Home = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Seasonal Offers / Promotion */}
+      <section className="relative py-24 overflow-hidden bg-slate-900">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?auto=format&fit=crop&q=80&w=1920"
+            alt="Seasonal Promotion Background"
+            className="w-full h-full object-cover opacity-35"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent"></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <span className="text-white text-[10px] uppercase tracking-wider font-bold bg-brand-accent rounded-full px-3 py-1 inline-block shadow-sm">
+              Limited Time Special
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-extrabold leading-tight text-white">
+              Honeymoon & Romantic Overwater Retreat Off-Season Promotion
+            </h2>
+            <p className="text-slate-300 font-medium leading-relaxed text-sm">
+              Book your dream Maldives Overwater Sanctuary retreat before June
+              30th and enjoy a complimentary speedboat upgrade plus 15% discount
+              on early booking packages.
+            </p>
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-6 pt-2">
+              <div className="flex items-center space-x-2 text-slate-300 text-sm font-semibold">
+                <Check className="h-5 w-5 text-brand-accent" />
+                <span>15% Early-Bird Pricing</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-300 text-sm font-semibold">
+                <Check className="h-5 w-5 text-brand-accent" />
+                <span>Complimentary Transfer Upgrade</span>
+              </div>
+            </div>
+            <div className="pt-4">
+              <Link
+                to="/packages/maldives-luxury-overwater-villa-escape"
+                className="inline-flex items-center justify-center px-6 py-3 bg-brand-accent hover:bg-orange-600 text-white font-bold tracking-wide rounded-md transition-colors text-xs uppercase tracking-wider shadow-sm"
+              >
+                Inquire Offer Details
+              </Link>
+            </div>
           </div>
         </div>
       </section>
