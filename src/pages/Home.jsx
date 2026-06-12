@@ -234,6 +234,62 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* 5. Why Choose Us */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <span className="text-primary text-xs uppercase tracking-widest font-bold">
+              Our Value
+            </span>
+            <h2 className="font-serif text-3xl font-extrabold mt-1 text-slate-800">
+              Why Travel With 1ClickTravel
+            </h2>
+            <div className="w-12 h-1 bg-primary mx-auto mt-3 rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+              <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
+                <Compass className="h-6 w-6" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-slate-800">
+                Customized Vacation Tours
+              </h3>
+              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                We design tour paths built fully around your wishes, allowing
+                you to control hotel stays, daily activities, and transport
+                paths.
+              </p>
+            </div>
+            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+              <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
+                <Award className="h-6 w-6" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-slate-800">
+                Hand-Picked Accommodations
+              </h3>
+              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                We cross-verify comfort ratings directly. Only highly reviewed
+                premium hotel suites and villa resorts enter our itineraries.
+              </p>
+            </div>
+            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+              <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-slate-800">
+                24/7 Local Support
+              </h3>
+              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                Travel in complete peace of mind. Our local representatives and
+                digital concierge desks stand by round the clock to support your
+                journey.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
