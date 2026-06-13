@@ -18,6 +18,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [durationFilter, setDurationFilter] = useState("");
+  const [activeFaq, setActiveFaq] = useState(null);
 
   const destinations = [
     {
@@ -46,6 +47,25 @@ const Home = () => {
     },
   ];
 
+  const faqs = [
+    {
+      q: "Are international flights included in the package price?",
+      a: "Generally, our tour packages do not include international airfare to give you maximum flexibility with airlines and cabin preferences. However, we handle all internal flights, transfers, and private boats as defined in each package itinerary.",
+    },
+    {
+      q: "Can I customize a package itinerary?",
+      a: "Absolutely. We specialize in custom vacation tours. Any package can be tailored to fit your preferred dates, hotel choices, activity level, or dietary requirements. Reach out to our team directly via the contact form or WhatsApp.",
+    },
+    {
+      q: "What is the booking deposit and cancellation policy?",
+      a: "For package confirmation, we require a 30% deposit. The remaining balance is payable 30 days before departure. Cancellations up to 45 days prior receive a full refund minus a 10% administration charge.",
+    },
+    {
+      q: "Are these tours private or in large groups?",
+      a: "1ClickTravel focuses on high-quality boutique travel. The majority of our tours are private (just for you and your travel partners) or small groups of maximum 8 travelers, ensuring dedicated service.",
+    },
+  ];
+
   const handleSearch = (e) => {
     e.preventDefault();
     let queryParams = [];
@@ -61,7 +81,7 @@ const Home = () => {
   return (
     <div className="relative w-full bg-white text-slate-800">
       {/* 1. Clean Modern Hero Section */}
-      <div className="relative min-h-[90vh] flex items-center justify-center bg-slate-900 overflow-hidden pt-16">
+      <div className="relative min-h-[100vh] flex items-center justify-center bg-slate-900 overflow-hidden pt-16">
         {/* Scenic Background Image */}
         <div className="absolute inset-0 z-0">
           <img
@@ -287,6 +307,50 @@ const Home = () => {
                 journey.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. FAQ Accordion */}
+      <section className="py-20 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-primary text-xs uppercase tracking-widest font-bold">
+              Common Queries
+            </span>
+            <h2 className="font-serif text-3xl font-extrabold mt-1 text-slate-800">
+              Frequently Asked Questions
+            </h2>
+            <div className="w-12 h-1 bg-primary mx-auto mt-3 rounded-full"></div>
+          </div>
+
+          <div className="space-y-3.5">
+            {faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-lg border border-slate-200/80 overflow-hidden shadow-sm"
+              >
+                <button
+                  onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                  className="w-full flex items-center justify-between p-4.5 text-left text-slate-800 hover:text-primary transition-colors focus:outline-none cursor-pointer"
+                >
+                  <span className="font-serif font-bold text-sm sm:text-base">
+                    {faq.q}
+                  </span>
+                  <ChevronDown
+                    className={`h-4.5 w-4.5 text-primary transition-transform duration-200 ${
+                      activeFaq === idx ? "transform rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {activeFaq === idx && (
+                  <div className="px-4.5 pb-4.5 border-t border-slate-100 pt-3 text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
