@@ -187,7 +187,7 @@ const Home = () => {
               <div
                 key={idx}
                 onClick={() => navigate(`/packages?search=${dest.name}`)}
-                className="group relative rounded-lg overflow-hidden h-64 cursor-pointer border border-slate-200/60 hover:border-slate-300 transition-all duration-200 shadow-sm"
+                className="group relative rounded-lg overflow-hidden h-64 cursor-pointer border border-slate-200/60 hover:border-slate-300 hover:scale-110 transition-all duration-200 shadow-sm"
               >
                 <img
                   src={dest.image}
@@ -246,7 +246,7 @@ const Home = () => {
             <div className="pt-4">
               <Link
                 to="/packages/maldives-luxury-overwater-villa-escape"
-                className="inline-flex items-center justify-center px-6 py-3 bg-brand-accent hover:bg-orange-600 text-white font-bold tracking-wide rounded-md transition-colors text-xs uppercase tracking-wider shadow-sm"
+                className="inline-flex items-center justify-center px-6 py-3 bg-brand-accent hover:bg-orange-600 hover:scale-110 text-white font-bold tracking-wide rounded-md transition-colors text-xs uppercase tracking-wider shadow-sm"
               >
                 Inquire Offer Details
               </Link>
@@ -268,8 +268,8 @@ const Home = () => {
             <div className="w-12 h-1 bg-primary mx-auto mt-3 rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+          <div className=" grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className=" hover:scale-105 text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
               <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
                 <Compass className="h-6 w-6" />
               </div>
@@ -282,7 +282,7 @@ const Home = () => {
                 paths.
               </p>
             </div>
-            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+            <div className=" hover:scale-105 text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
               <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
                 <Award className="h-6 w-6" />
               </div>
@@ -294,7 +294,7 @@ const Home = () => {
                 premium hotel suites and villa resorts enter our itineraries.
               </p>
             </div>
-            <div className="text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
+            <div className="hover:scale-105 text-center space-y-3 p-6 bg-white rounded-lg border border-slate-200/60 shadow-sm hover:border-slate-300 transition-colors">
               <div className="mx-auto h-12 w-12 bg-sky-50 rounded-full flex items-center justify-center text-primary mb-3">
                 <ShieldCheck className="h-6 w-6" />
               </div>
@@ -307,6 +307,48 @@ const Home = () => {
                 journey.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Instagram-style Gallery */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-primary text-xs uppercase tracking-widest font-bold">
+              Visual Stories
+            </span>
+            <h2 className="font-serif text-3xl font-extrabold mt-1 text-slate-800">
+              Instagram Inspiration
+            </h2>
+            <div className="w-12 h-1 bg-primary mx-auto mt-3 rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            {[
+              "https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?auto=format&fit=crop&q=80&w=300",
+              "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?auto=format&fit=crop&q=80&w=300",
+              "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=300",
+              "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=300",
+              "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=300",
+              "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=300",
+            ].map((img, idx) => (
+              <div
+                key={idx}
+                className="relative aspect-square overflow-hidden rounded group border border-slate-200/50 shadow-sm bg-white"
+              >
+                <img
+                  src={img}
+                  alt={`Gallery ${idx + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 "
+                />
+                <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold tracking-wider">
+                    @1clickyatra
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
