@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   MapPin,
@@ -13,12 +14,23 @@ import {
 } from "lucide-react";
 
 import { useNavigate, Link } from "react-router-dom";
+import PackageCard from "../component/ui/PackageCard.jsx";
+import Loader from "../component/ui/Loader.jsx";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [durationFilter, setDurationFilter] = useState("");
   const [activeFaq, setActiveFaq] = useState(null);
+
+  // Fetch Featured Packages
+  const { data: featuredPackages, isLoading: loadingPkgs } = useQuery({
+    queryKey: ["featuredPackages"],
+    queryFn: async () => {
+      const res = await API.get("/packages?featured=true&limit=3");
+      return res.data.data;
+    },
+  });
 
   const destinations = [
     {
@@ -77,7 +89,6 @@ const Home = () => {
       `/packages${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`,
     );
   };
-
   return (
     <div className="relative w-full bg-white text-slate-800">
       {/* 1. Clean Modern Hero Section */}
@@ -206,6 +217,41 @@ const Home = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 3. Featured Packages */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-12 border-b border-slate-100 pb-4">
+            <div>
+              <span className="text-primary text-xs uppercase tracking-widest font-bold">
+                Top Recommendations
+              </span>
+              <h2 className="font-serif text-3xl font-extrabold mt-1 text-slate-800">
+                Featured Packages
+              </h2>
+            </div>
+            <Link
+              to="/packages"
+              className="mt-4 sm:mt-0 inline-flex items-center space-x-2 text-primary hover:text-primary-dark transition-colors font-bold text-xs uppercase tracking-wider"
+            >
+              <span>View All Packages</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          {loadingPkgs ? (
+            <Loader />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredPackages &&
+                featuredPackages.map((pkg) => (
+                  <div key={pkg._id}>
+                    <PackageCard pkg={pkg} />
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </section>
 
