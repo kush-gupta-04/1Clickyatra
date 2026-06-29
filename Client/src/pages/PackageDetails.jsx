@@ -756,6 +756,36 @@ const PackageDetails = () => {
           </div>
         </div>
 
+        {/* 4. Similar Packages Section */}
+        {similarPackages && similarPackages.length > 0 && (
+          <div className="space-y-6 pt-10 border-t border-slate-200">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-800">
+              Similar Vacations Recommended
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {similarPackages.map((pkg) => (
+                <div key={pkg._id} className="group relative bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col hover:shadow-soft transition-all duration-200">
+                  <img src={getImgUrl(pkg.thumbnail)} alt={pkg.title} className="w-full h-40 object-cover bg-slate-100" />
+                  <div className="p-4 flex-grow flex flex-col justify-between space-y-3">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{pkg.category}</span>
+                      <h4 className="font-serif font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                        <Link to={`/packages/${pkg.slug}`}>{pkg.title}</Link>
+                      </h4>
+                    </div>
+                    <div className="flex justify-between items-center pt-2.5 border-t border-slate-100">
+                      <span className="text-sm font-extrabold text-slate-800">${pkg.price}</span>
+                      <Link to={`/packages/${pkg.slug}`} className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">
+                        Details
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
