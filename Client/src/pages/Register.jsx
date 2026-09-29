@@ -342,7 +342,7 @@ const Register = () => {
               to="/login"
               className="text-primary hover:underline font-bold"
             >
-              Sign In
+              Log In
             </Link>
           </div>
         </div>
