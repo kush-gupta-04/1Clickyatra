@@ -21,6 +21,12 @@ import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import UserDashboard from "./pages/UserDashboard.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import ProtectedRoute from "./component/routing/ProtectedRoute.jsx";
+
+import CreatePackage from "./pages/admin/CreatePackage.jsx";
+import CreateBlog from "./pages/admin/CreateBlog.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -41,6 +47,17 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<UserDashboard />} />
+            </Route>
+            
+            <Route element={<ProtectedRoute adminOnly={true} />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/packages/create" element={<CreatePackage />} />
+              <Route path="/admin/blogs/create" element={<CreateBlog />} />
+            </Route>
 
             {/* Fallback Catch-all Route */}
             <Route path="*" element={<Navigate to="/" replace />} />

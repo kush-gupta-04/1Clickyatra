@@ -157,20 +157,34 @@ const AdminDashboard = () => {
                 <span>Quick Management</span>
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Manage Packages */}
-                <div className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group">
+                <Link to="/admin/packages/create" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-2 bg-emerald-100 text-emerald-700 rounded-md">
                       <Map className="h-5 w-5" />
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-bold text-slate-800">Manage Packages</h3>
+                  <h3 className="font-bold text-slate-800">Add Package</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">
-                    Add, edit, or delete travel destinations.
+                    Create a new travel destination package.
                   </p>
-                </div>
+                </Link>
+
+                {/* Add Blog */}
+                <Link to="/admin/blogs/create" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2 bg-rose-100 text-rose-700 rounded-md">
+                      <Settings className="h-5 w-5" />
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <h3 className="font-bold text-slate-800">Add Blog</h3>
+                  <p className="text-xs text-slate-500 font-medium mt-1">
+                    Publish a new article for the travel blog.
+                  </p>
+                </Link>
 
                 {/* Manage Bookings */}
                 <div className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group">
@@ -182,7 +196,7 @@ const AdminDashboard = () => {
                   </div>
                   <h3 className="font-bold text-slate-800">Manage Bookings</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">
-                    Review and update customer booking statuses.
+                    Review customer booking statuses.
                   </p>
                 </div>
 
@@ -196,7 +210,7 @@ const AdminDashboard = () => {
                   </div>
                   <h3 className="font-bold text-slate-800">Manage Users</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">
-                    View user profiles and handle account queries.
+                    View and handle user accounts.
                   </p>
                 </div>
               </div>
