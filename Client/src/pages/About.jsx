@@ -9,6 +9,7 @@ import {
   Star,
   Users,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Breadcrumbs from "../component/ui/Breadcrumbs.jsx";
 
 const About = () => {
@@ -69,9 +70,9 @@ const About = () => {
             access.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="px-8 py-4 bg-primary text-white rounded-full font-semibold tracking-wide hover:bg-primary-dark transition-all duration-300 shadow-[0_0_20px_rgba(2,132,199,0.4)] hover:shadow-[0_0_30px_rgba(2,132,199,0.6)] hover:-translate-y-1 flex items-center gap-2">
+            <Link to="/contact" className="px-8 py-4 bg-primary text-white rounded-full font-semibold tracking-wide hover:bg-primary-dark transition-all duration-300 shadow-[0_0_20px_rgba(2,132,199,0.4)] hover:shadow-[0_0_30px_rgba(2,132,199,0.6)] hover:-translate-y-1 flex items-center gap-2">
               Start Planning <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
           </div>
         </div>
 
