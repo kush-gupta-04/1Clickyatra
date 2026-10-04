@@ -13,6 +13,14 @@ import { Link } from "react-router-dom";
 import Breadcrumbs from "../component/ui/Breadcrumbs.jsx";
 
 const About = () => {
+  const whatsappPhone = (
+    import.meta.env.VITE_WHATSAPP_PHONE || "+1234567890"
+  ).replace(/\D/g, "");
+  const whatsappMessage = encodeURIComponent(
+    "Hello 1ClickTravel, I would like to consult an expert about planning a trip.",
+  );
+  const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
+
   const stats = [
     { value: "10+", label: "Years of Excellence", icon: Star },
     { value: "5,000+", label: "Happy Travelers", icon: Users },
@@ -70,7 +78,10 @@ const About = () => {
             access.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/contact" className="px-8 py-4 bg-primary text-white rounded-full font-semibold tracking-wide hover:bg-primary-dark transition-all duration-300 shadow-[0_0_20px_rgba(2,132,199,0.4)] hover:shadow-[0_0_30px_rgba(2,132,199,0.6)] hover:-translate-y-1 flex items-center gap-2">
+            <Link
+              to="/contact"
+              className="px-8 py-4 bg-primary text-white rounded-full font-semibold tracking-wide hover:bg-primary-dark transition-all duration-300 shadow-[0_0_20px_rgba(2,132,199,0.4)] hover:shadow-[0_0_30px_rgba(2,132,199,0.6)] hover:-translate-y-1 flex items-center gap-2"
+            >
               Start Planning <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -237,12 +248,20 @@ const About = () => {
             Let's turn your travel dreams into a meticulously planned reality.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="px-10 py-4 bg-slate-900 text-white rounded-full font-semibold tracking-wide hover:bg-primary transition-colors duration-300 shadow-xl">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-10 py-4 bg-slate-900 text-white rounded-full font-semibold tracking-wide hover:bg-primary transition-colors duration-300 shadow-xl"
+            >
               Consult an Expert
-            </button>
-            <button className="px-10 py-4 bg-white text-slate-900 rounded-full font-semibold tracking-wide hover:bg-slate-50 transition-colors duration-300 shadow-lg border border-slate-200">
+            </a>
+            <Link
+              to="/packages"
+              className="px-10 py-4 bg-white text-slate-900 rounded-full font-semibold tracking-wide hover:bg-slate-50 transition-colors duration-300 shadow-lg border border-slate-200"
+            >
               Explore Destinations
-            </button>
+            </Link>
           </div>
         </div>
       </div>
