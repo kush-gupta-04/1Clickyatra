@@ -17,6 +17,7 @@ import {
   Compass,
 } from "lucide-react";
 import API from "../api/axios.js";
+import GoogleAuthButton from "../component/ui/GoogleAuthButton.jsx";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -87,26 +88,6 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Simulated Google authentication for UI fidelity
-    dispatch(authStart());
-    setTimeout(() => {
-      // Simulate successful login of a user
-      dispatch(
-        authSuccess({
-          user: {
-            id: "google-user-id",
-            name: "Jane Smith",
-            email: "jane.smith@gmail.com",
-            role: "user",
-            wishlist: [],
-          },
-          token: "simulated-google-token",
-        }),
-      );
-      navigate("/dashboard");
-    }, 1000);
-  };
   return (
     <div className="min-h-screen bg-slate-50 flex items-stretch">
       {/* Left side: Scenic Travel Image */}
@@ -245,31 +226,10 @@ const Login = () => {
             <div className="flex-grow border-t border-slate-200"></div>
           </div>
 
-          {/* Google Sign In */}
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-md transition-colors text-xs uppercase tracking-wider flex items-center justify-center space-x-3 cursor-pointer shadow-sm"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M23.7 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.6c-.3 1.5-1.1 2.8-2.4 3.7v3.1h3.9c2.3-2.1 3.6-5.2 3.6-9.1z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3.1c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.8-5H1.2v3.2C3.2 21.4 7.3 24 12 24z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.2 14.2c-.2-.7-.4-1.4-.4-2.2s.2-1.5.4-2.2V6.6H1.2C.4 8.2 0 10 0 12s.4 3.8 1.2 5.4l4-3.2z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4C18 1.2 15.2 0 12 0 7.3 0 3.2 2.6 1.2 6.6l4 3.2c1-2.9 3.7-5 6.8-5z"
-              />
-            </svg>
-            <span>Continue with Google</span>
-          </button>
+          <GoogleAuthButton
+            text="continue_with"
+            onError={(message) => setErrorMsg(message)}
+          />
 
           <div className="text-center text-xs text-slate-500 font-medium">
             <span>Don't have an account? </span>

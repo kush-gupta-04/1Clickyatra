@@ -18,8 +18,14 @@ const GoogleAuthButton = ({ text, onError }) => {
       const user = response.data.data;
       dispatch(authSuccess({ user, token: user.token }));
     } catch (error) {
+      console.error("Google Auth error:", error);
       const message =
-        error.response?.data?.message || "Google sign-in failed. Please try again.";
+        error.response?.data?.message ||
+        (error.code === "auth/popup-closed-by-user"
+          ? "Google sign-in popup was closed before completion."
+          : error.code === "auth/popup-blocked"
+          ? "Google sign-in popup was blocked by browser."
+          : error.message || "Google sign-in failed. Please try again.");
       dispatch(authFailure(message));
       onError?.(message);
     }
