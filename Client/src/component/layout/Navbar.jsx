@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../../pages/Login";
 import Register from "../../pages/Register";
+import { logout } from "../../store/slices/authSlice";
+import API from "../../api/axios";
 import {
   Menu,
   X,
@@ -34,6 +36,18 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    dispatch(logout());
+    navigate("/");
+    setDropdownOpen(false);
+    setIsOpen(false);
+  };
 
   const navLinks = [
     { name: "Home", path: "/" },

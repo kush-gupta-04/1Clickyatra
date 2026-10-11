@@ -81,9 +81,17 @@ const packageSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, "Price is required"],
+    min: [0, "Price cannot be negative"],
   },
   discountedPrice: {
     type: Number,
+    min: [0, "Discounted price cannot be negative"],
+    validate: {
+      validator(value) {
+        return value == null || value <= this.price;
+      },
+      message: "Discounted price cannot exceed the regular price",
+    },
   },
   inclusions: {
     type: [String],
@@ -126,6 +134,8 @@ const packageSchema = new mongoose.Schema({
   ratings: {
     type: Number,
     default: 5,
+    min: 0,
+    max: 5,
   },
   reviews: [reviewSchema],
   seo: {
@@ -140,10 +150,9 @@ const packageSchema = new mongoose.Schema({
 });
 
 // Generate slug before saving
-packageSchema.pre("save", function (next) {
-  if (!this.isModified("title")) return next();
+packageSchema.pre("save", function () {
+  if (!this.isModified("title")) return;
   this.slug = slugify(this.title, { lower: true, strict: true });
-  next();
 });
 
 const Package = mongoose.model("Package", packageSchema);

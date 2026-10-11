@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -16,6 +15,7 @@ import WhatsAppCTA from "./component/layout/WhatsappCTA.jsx";
 //Pages
 import Home from "./pages/Home.jsx";
 import Packages from "./pages/Packages.jsx";
+import PackageDetails from "./pages/PackageDetails.jsx";
 import Blogs from "./pages/Blogs.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
@@ -29,8 +29,6 @@ import CreatePackage from "./pages/admin/CreatePackage.jsx";
 import CreateBlog from "./pages/admin/CreateBlog.jsx";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-luxury-dark text-slate-100 font-sans selection:bg-primary selection:text-luxury-dark">
@@ -42,6 +40,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/packages" element={<Packages />} />
+            <Route path="/packages/:slug" element={<PackageDetails />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -52,10 +51,13 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<UserDashboard />} />
             </Route>
-            
+
             <Route element={<ProtectedRoute adminOnly={true} />}>
               <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/packages/create" element={<CreatePackage />} />
+              <Route
+                path="/admin/packages/create"
+                element={<CreatePackage />}
+              />
               <Route path="/admin/blogs/create" element={<CreateBlog />} />
             </Route>
 

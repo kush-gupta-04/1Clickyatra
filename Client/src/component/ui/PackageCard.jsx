@@ -72,7 +72,7 @@ const PackageCard = ({ pkg }) => {
         {/* Discount Tag */}
         {pkg.discountedPrice && (
           <span className="absolute top-3 left-3 text-[10px] font-bold tracking-wider uppercase bg-brand-accent text-white px-2.5 py-0.5 rounded shadow-sm">
-            Save ${pkg.price - pkg.discountedPrice}
+            Save ₹{(pkg.price - pkg.discountedPrice).toLocaleString("en-IN")}
           </span>
         )}
       </div>
@@ -118,11 +118,14 @@ const PackageCard = ({ pkg }) => {
             </p>
             <div className="flex items-baseline space-x-1.5">
               <span className="text-lg font-extrabold text-slate-800">
-                ${pkg.discountedPrice || pkg.price}
+                ₹
+                {Number(pkg.discountedPrice || pkg.price).toLocaleString(
+                  "en-IN",
+                )}
               </span>
               {pkg.discountedPrice && (
                 <span className="text-xs text-slate-400 line-through">
-                  ${pkg.price}
+                  ₹{Number(pkg.price).toLocaleString("en-IN")}
                 </span>
               )}
             </div>

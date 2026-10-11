@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
 import API from "../../api/axios";
 
 const CreatePackage = () => {
@@ -22,7 +22,7 @@ const CreatePackage = () => {
     transport: "",
     groupSize: "Any",
     featured: false,
-    status: "draft",
+    status: "published",
     seoTitle: "",
     seoDesc: "",
     seoKeywords: "",
@@ -30,14 +30,14 @@ const CreatePackage = () => {
 
   const [inclusions, setInclusions] = useState([""]);
   const [exclusions, setExclusions] = useState([""]);
-  
+
   const [itinerary, setItinerary] = useState([
     { day: 1, title: "", description: "", meals: "" },
   ]);
 
   const [thumbnail, setThumbnail] = useState(null);
   const [images, setImages] = useState([]);
-  
+
   const [thumbnailPreview, setThumbnailPreview] = useState("");
 
   const handleInputChange = (e) => {
@@ -55,7 +55,9 @@ const CreatePackage = () => {
   };
 
   const addListItem = (type) => {
-    type === "inclusions" ? setInclusions([...inclusions, ""]) : setExclusions([...exclusions, ""]);
+    type === "inclusions"
+      ? setInclusions([...inclusions, ""])
+      : setExclusions([...exclusions, ""]);
   };
 
   const removeListItem = (index, type) => {
@@ -106,35 +108,31 @@ const CreatePackage = () => {
 
     try {
       const data = new FormData();
-      
+
       // Basic Fields
       Object.keys(formData).forEach((key) => {
         if (!key.startsWith("seo")) {
-           data.append(key, formData[key]);
+          data.append(key, formData[key]);
         }
       });
 
       // Filter empty list items
       const validInclusions = inclusions.filter((item) => item.trim() !== "");
       const validExclusions = exclusions.filter((item) => item.trim() !== "");
-      
-      validInclusions.forEach((inc) => data.append("inclusions[]", inc));
-      validExclusions.forEach((exc) => data.append("exclusions[]", exc));
+
+      data.append("inclusions", JSON.stringify(validInclusions));
+      data.append("exclusions", JSON.stringify(validExclusions));
 
       // Itinerary mapping
       const validItinerary = itinerary.map((item) => ({
         ...item,
-        meals: item.meals.split(",").map((m) => m.trim()).filter(m => m)
+        meals: item.meals
+          .split(",")
+          .map((m) => m.trim())
+          .filter((m) => m),
       }));
-      
-      validItinerary.forEach((item, index) => {
-        data.append(`itinerary[${index}][day]`, item.day);
-        data.append(`itinerary[${index}][title]`, item.title);
-        data.append(`itinerary[${index}][description]`, item.description);
-        item.meals.forEach((meal, mealIndex) => {
-           data.append(`itinerary[${index}][meals][${mealIndex}]`, meal);
-        });
-      });
+
+      data.append("itinerary", JSON.stringify(validItinerary));
 
       // SEO
       const seoData = {
@@ -142,14 +140,12 @@ const CreatePackage = () => {
         description: formData.seoDesc,
         keywords: formData.seoKeywords,
       };
-      // Usually backend accepts seo as object or JSON string. 
+      // Usually backend accepts seo as object or JSON string.
       // The backend packageController might need logic to parse it. If it doesn't parse, we can skip or send as string.
-      // packageController doesn't have JSON.parse for SEO in standard format, but let's assume it accepts object notation via bracket syntax, or we just skip it if backend doesn't handle it well. 
+      // packageController doesn't have JSON.parse for SEO in standard format, but let's assume it accepts object notation via bracket syntax, or we just skip it if backend doesn't handle it well.
       // I'll skip complex bracket serialization and send string if backend handles it, but let's just ignore SEO if it's too complex or send it as json string.
       // Looking at the package model, seo is an object.
-      data.append(`seo[title]`, formData.seoTitle);
-      data.append(`seo[description]`, formData.seoDesc);
-      data.append(`seo[keywords]`, formData.seoKeywords);
+      data.append("seo", JSON.stringify(seoData));
 
       if (thumbnail) {
         data.append("thumbnail", thumbnail);
@@ -173,7 +169,9 @@ const CreatePackage = () => {
       }
     } catch (error) {
       setErrorMsg(
-        error.response?.data?.message || error.message || "Failed to create package"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create package",
       );
     } finally {
       setLoading(false);
@@ -214,7 +212,6 @@ const CreatePackage = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
-              
               {/* Basic Info */}
               <div className="space-y-5">
                 <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
@@ -222,20 +219,58 @@ const CreatePackage = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Title</label>
-                    <input type="text" name="title" required value={formData.title} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="Package Title" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      required
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                      placeholder="Package Title"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Destination</label>
-                    <input type="text" name="destination" required value={formData.destination} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="City, Country" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Destination
+                    </label>
+                    <input
+                      type="text"
+                      name="destination"
+                      required
+                      value={formData.destination}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                      placeholder="City, Country"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Duration</label>
-                    <input type="text" name="duration" required value={formData.duration} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. 5 Days / 4 Nights" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Duration
+                    </label>
+                    <input
+                      type="text"
+                      name="duration"
+                      required
+                      value={formData.duration}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                      placeholder="e.g. 5 Days / 4 Nights"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Category</label>
-                    <select name="category" required value={formData.category} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Category
+                    </label>
+                    <select
+                      name="category"
+                      required
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"
+                    >
                       <option value="">Select Category</option>
                       <option value="Honeymoon">Honeymoon</option>
                       <option value="Adventure">Adventure</option>
@@ -245,26 +280,65 @@ const CreatePackage = () => {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Price (₹)</label>
-                    <input type="number" name="price" required value={formData.price} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="Base price" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      required
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                      placeholder="Base price"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Discounted Price (₹)</label>
-                    <input type="number" name="discountedPrice" value={formData.discountedPrice} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="Optional" />
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Discounted Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      name="discountedPrice"
+                      value={formData.discountedPrice}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                      placeholder="Optional"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Descriptions */}
               <div className="space-y-5">
-                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Descriptions</h2>
+                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
+                  Descriptions
+                </h2>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Overview (Short)</label>
-                  <textarea name="overview" required rows={3} value={formData.overview} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"></textarea>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Overview (Short)
+                  </label>
+                  <textarea
+                    name="overview"
+                    required
+                    rows={3}
+                    value={formData.overview}
+                    onChange={handleInputChange}
+                    className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                  ></textarea>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Full Description</label>
-                  <textarea name="description" required rows={5} value={formData.description} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"></textarea>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Full Description
+                  </label>
+                  <textarea
+                    name="description"
+                    required
+                    rows={5}
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                  ></textarea>
                 </div>
               </div>
 
@@ -273,14 +347,30 @@ const CreatePackage = () => {
                 <div className="space-y-4">
                   <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 flex justify-between items-center">
                     <span>Inclusions</span>
-                    <button type="button" onClick={() => addListItem("inclusions")} className="text-primary hover:text-primary-dark text-xs flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => addListItem("inclusions")}
+                      className="text-primary hover:text-primary-dark text-xs flex items-center"
+                    >
                       <Plus className="h-3 w-3 mr-1" /> Add
                     </button>
                   </h2>
                   {inclusions.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <input type="text" value={item} onChange={(e) => handleListChange(index, e.target.value, "inclusions")} className="flex-1 border border-slate-200 rounded-md py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Daily Breakfast" />
-                      <button type="button" onClick={() => removeListItem(index, "inclusions")} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors">
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) =>
+                          handleListChange(index, e.target.value, "inclusions")
+                        }
+                        className="flex-1 border border-slate-200 rounded-md py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                        placeholder="e.g. Daily Breakfast"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(index, "inclusions")}
+                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -289,14 +379,30 @@ const CreatePackage = () => {
                 <div className="space-y-4">
                   <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 flex justify-between items-center">
                     <span>Exclusions</span>
-                    <button type="button" onClick={() => addListItem("exclusions")} className="text-primary hover:text-primary-dark text-xs flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => addListItem("exclusions")}
+                      className="text-primary hover:text-primary-dark text-xs flex items-center"
+                    >
                       <Plus className="h-3 w-3 mr-1" /> Add
                     </button>
                   </h2>
                   {exclusions.map((item, index) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <input type="text" value={item} onChange={(e) => handleListChange(index, e.target.value, "exclusions")} className="flex-1 border border-slate-200 rounded-md py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Flight Tickets" />
-                      <button type="button" onClick={() => removeListItem(index, "exclusions")} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors">
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) =>
+                          handleListChange(index, e.target.value, "exclusions")
+                        }
+                        className="flex-1 border border-slate-200 rounded-md py-1.5 px-3 text-sm focus:ring-1 focus:ring-primary outline-none"
+                        placeholder="e.g. Flight Tickets"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(index, "exclusions")}
+                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -308,24 +414,75 @@ const CreatePackage = () => {
               <div className="space-y-5">
                 <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 flex justify-between items-center">
                   <span>Itinerary</span>
-                  <button type="button" onClick={addItineraryDay} className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-md text-xs font-bold transition-colors flex items-center">
+                  <button
+                    type="button"
+                    onClick={addItineraryDay}
+                    className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-md text-xs font-bold transition-colors flex items-center"
+                  >
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
                   </button>
                 </h2>
-                
+
                 <div className="space-y-4">
                   {itinerary.map((day, index) => (
-                    <div key={index} className="p-4 border border-slate-200 rounded-lg bg-slate-50 relative">
+                    <div
+                      key={index}
+                      className="p-4 border border-slate-200 rounded-lg bg-slate-50 relative"
+                    >
                       {index > 0 && (
-                        <button type="button" onClick={() => removeItineraryDay(index)} className="absolute top-4 right-4 text-slate-400 hover:text-rose-500">
+                        <button
+                          type="button"
+                          onClick={() => removeItineraryDay(index)}
+                          className="absolute top-4 right-4 text-slate-400 hover:text-rose-500"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}
-                      <h3 className="font-bold text-slate-700 mb-3">Day {day.day}</h3>
+                      <h3 className="font-bold text-slate-700 mb-3">
+                        Day {day.day}
+                      </h3>
                       <div className="space-y-3">
-                        <input type="text" required value={day.title} onChange={(e) => handleItineraryChange(index, "title", e.target.value)} placeholder="Day Title (e.g. Arrival in Paris)" className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white" />
-                        <textarea required value={day.description} onChange={(e) => handleItineraryChange(index, "description", e.target.value)} placeholder="Day Description..." rows={2} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"></textarea>
-                        <input type="text" value={day.meals} onChange={(e) => handleItineraryChange(index, "meals", e.target.value)} placeholder="Meals (comma separated, e.g. Breakfast, Dinner)" className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white" />
+                        <input
+                          type="text"
+                          required
+                          value={day.title}
+                          onChange={(e) =>
+                            handleItineraryChange(
+                              index,
+                              "title",
+                              e.target.value,
+                            )
+                          }
+                          placeholder="Day Title (e.g. Arrival in Paris)"
+                          className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"
+                        />
+                        <textarea
+                          required
+                          value={day.description}
+                          onChange={(e) =>
+                            handleItineraryChange(
+                              index,
+                              "description",
+                              e.target.value,
+                            )
+                          }
+                          placeholder="Day Description..."
+                          rows={2}
+                          className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"
+                        ></textarea>
+                        <input
+                          type="text"
+                          value={day.meals}
+                          onChange={(e) =>
+                            handleItineraryChange(
+                              index,
+                              "meals",
+                              e.target.value,
+                            )
+                          }
+                          placeholder="Meals (comma separated, e.g. Breakfast, Dinner)"
+                          className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"
+                        />
                       </div>
                     </div>
                   ))}
@@ -334,47 +491,98 @@ const CreatePackage = () => {
 
               {/* Media */}
               <div className="space-y-5">
-                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Media</h2>
+                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
+                  Media
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block">Thumbnail Image</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block">
+                      Thumbnail Image
+                    </label>
                     <div className="flex items-center space-x-4">
                       {thumbnailPreview && (
-                        <img src={thumbnailPreview} alt="Preview" className="h-16 w-24 object-cover rounded-md border border-slate-200" />
+                        <img
+                          src={thumbnailPreview}
+                          alt="Preview"
+                          className="h-16 w-24 object-cover rounded-md border border-slate-200"
+                        />
                       )}
-                      <input type="file" required accept="image/*" onChange={handleThumbnailChange} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+                      <input
+                        type="file"
+                        required
+                        accept="image/*"
+                        onChange={handleThumbnailChange}
+                        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block">Gallery Images (Max 12)</label>
-                    <input type="file" multiple accept="image/*" onChange={handleImagesChange} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
-                    <p className="text-xs text-slate-500 mt-1">{images.length} files selected</p>
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block">
+                      Gallery Images (Max 12)
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImagesChange}
+                      className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      {images.length} files selected
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Additional Options */}
               <div className="space-y-5">
-                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Options & Status</h2>
+                <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
+                  Options & Status
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">Status</label>
-                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleInputChange}
+                      className="w-full border border-slate-200 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-primary outline-none bg-white"
+                    >
                       <option value="draft">Draft</option>
                       <option value="published">Published</option>
                     </select>
                   </div>
                   <div className="flex items-center pt-6 space-x-2">
-                    <input type="checkbox" id="featured" name="featured" checked={formData.featured} onChange={handleInputChange} className="h-4 w-4 text-primary rounded border-slate-300" />
-                    <label htmlFor="featured" className="text-sm font-semibold text-slate-700 select-none">Mark as Featured</label>
+                    <input
+                      type="checkbox"
+                      id="featured"
+                      name="featured"
+                      checked={formData.featured}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-primary rounded border-slate-300"
+                    />
+                    <label
+                      htmlFor="featured"
+                      className="text-sm font-semibold text-slate-700 select-none"
+                    >
+                      Mark as Featured
+                    </label>
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex justify-end">
-                <button type="submit" disabled={loading} className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm flex items-center space-x-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm flex items-center space-x-2"
+                >
                   <Save className="h-4 w-4" />
-                  <span>{loading ? "Saving Package..." : "Create Package"}</span>
+                  <span>
+                    {loading ? "Saving Package..." : "Create Package"}
+                  </span>
                 </button>
               </div>
             </form>

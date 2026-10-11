@@ -1,13 +1,10 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
-  MapPin,
   Compass,
   ShieldCheck,
   Award,
-  Star,
   ArrowRight,
   ChevronDown,
   Check,
@@ -16,8 +13,10 @@ import {
 import { useNavigate, Link } from "react-router-dom";
 import PackageCard from "../component/ui/PackageCard.jsx";
 import Loader from "../component/ui/Loader.jsx";
+import API from "../api/axios.js";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [durationFilter, setDurationFilter] = useState("");

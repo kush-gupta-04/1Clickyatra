@@ -1,7 +1,7 @@
 import express from "express";
 // import cors from "cors";
 // import helmet from "helmet";
-// import cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 // import rateLimit from "express-rate-limit";
 // import path from "path";
 // import { fileURLToPath } from "url";
@@ -11,7 +11,7 @@ import { errorHandler } from "./middleware/error.js";
 // Import Routes
 import authRoutes from "./routes/auth.js";
 import inquiryRoutes from "./routes/inquiries.js";
-// import packageRoutes from "./routes/packages.js";
+import packageRoutes from "./routes/packages.js";
 // import bookingRoutes from "./routes/bookings.js";
 // import blogRoutes from "./routes/blogs.js";
 // import inquiryRoutes from "./routes/inquiries.js";
@@ -39,7 +39,7 @@ const app = express();
 // // Body parsers & cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // // Rate limiting
 // const limiter = rateLimit({
@@ -57,7 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 // Register Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/inquiries", inquiryRoutes);
-// app.use("/api/packages", packageRoutes);
+app.use("/api/packages", packageRoutes);
 // app.use("/api/bookings", bookingRoutes);
 // app.use("/api/blogs", blogRoutes);
 // app.use("/api/inquiries", inquiryRoutes);

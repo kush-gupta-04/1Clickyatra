@@ -1,86 +1,108 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
-import { Helmet } from 'react-helmet-async';
-import { Calendar, MapPin, Users, Heart, Star, Check, X, ShieldAlert, Phone, Send, Info, Hotel, Truck } from 'lucide-react';
-import API from '../api/axios.js';
-import Loader from '../components/ui/Loader.jsx';
-import Breadcrumbs from '../components/ui/Breadcrumbs.jsx';
+import { useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Star,
+  Check,
+  X,
+  ShieldAlert,
+  Phone,
+  Send,
+  Info,
+  Hotel,
+  Truck,
+} from "lucide-react";
+import API from "../api/axios.js";
+import Loader from "../component/ui/Loader.jsx";
+import Breadcrumbs from "../component/ui/Breadcrumbs.jsx";
 
 const PackageDetails = () => {
-
-  const PackageDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [activeItineraryDay, setActiveItineraryDay] = useState(1);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // Booking Form State
   const [bookingPersons, setBookingPersons] = useState(1);
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingMessage, setBookingMessage] = useState('');
+  const [bookingDate, setBookingDate] = useState("");
+  const [bookingMessage, setBookingMessage] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingError, setBookingError] = useState('');
+  const [bookingError, setBookingError] = useState("");
 
   // Inquiry Form State (Fallback if guest or general)
-  const [inquiryName, setInquiryName] = useState(user?.name || '');
-  const [inquiryEmail, setInquiryEmail] = useState(user?.email || '');
-  const [inquiryPhone, setInquiryPhone] = useState(user?.phone || '');
-  const [inquiryMessage, setInquiryMessage] = useState('');
+  const [inquiryName, setInquiryName] = useState(user?.name || "");
+  const [inquiryEmail, setInquiryEmail] = useState(user?.email || "");
+  const [inquiryPhone, setInquiryPhone] = useState(user?.phone || "");
+  const [inquiryMessage, setInquiryMessage] = useState("");
   const [inquirySuccess, setInquirySuccess] = useState(false);
 
   // Review Form State
   const [reviewRating, setReviewRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState('');
-  const [reviewError, setReviewError] = useState('');
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
   //Fetch Package Details
-  const { data: pkg, isLoading, error } = useQuery({
-    queryKey: ['package', slug],
+  const {
+    data: pkg,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["package", slug],
     queryFn: async () => {
       const res = await API.get(`/packages/${slug}`);
       return res.data.data;
     },
   });
 
-   // Set default selected image when package loads
-  useEffect(() => {
-    if (pkg) {
-      setSelectedImage(pkg.thumbnail);
-    }
-  }, [pkg]);
+  const { data: similarPackages = [] } = useQuery({
+    queryKey: ["similarPackages", pkg?.category, pkg?._id],
+    enabled: Boolean(pkg?.category),
+    queryFn: async () => {
+      const res = await API.get("/packages", {
+        params: { category: pkg.category, limit: 4 },
+      });
+      return res.data.data.filter((item) => item._id !== pkg._id).slice(0, 3);
+    },
+  });
+  const activeImage =
+    selectedImage?.slug === slug ? selectedImage.url : pkg?.thumbnail;
 
-// Booking Mutation
+  // Booking Mutation
   const bookingMutation = useMutation({
     mutationFn: async (bookingData) => {
-      return await API.post('/bookings', bookingData);
+      return await API.post("/bookings", bookingData);
     },
     onSuccess: () => {
       setBookingSuccess(true);
-      setBookingError('');
+      setBookingError("");
       setBookingPersons(1);
-      setBookingDate('');
-      setBookingMessage('');
-      queryClient.invalidateQueries(['my-bookings']);
+      setBookingDate("");
+      setBookingMessage("");
+      queryClient.invalidateQueries(["my-bookings"]);
     },
     onError: (err) => {
-      setBookingError(err.response?.data?.message || 'Failed to submit booking inquiry');
+      setBookingError(
+        err.response?.data?.message || "Failed to submit booking inquiry",
+      );
     },
   });
 
   // Inquiry Mutation
   const inquiryMutation = useMutation({
     mutationFn: async (inquiryData) => {
-      return await API.post('/inquiries', inquiryData);
+      return await API.post("/inquiries", inquiryData);
     },
     onSuccess: () => {
       setInquirySuccess(true);
-      setInquiryMessage('');
+      setInquiryMessage("");
     },
   });
 
@@ -90,23 +112,23 @@ const PackageDetails = () => {
       return await API.post(`/packages/${pkg._id}/reviews`, reviewData);
     },
     onSuccess: () => {
-      setReviewComment('');
+      setReviewComment("");
       setReviewRating(5);
-      setReviewError('');
-      queryClient.invalidateQueries(['package', slug]);
+      setReviewError("");
+      queryClient.invalidateQueries(["package", slug]);
     },
     onError: (err) => {
-      setReviewError(err.response?.data?.message || 'Failed to submit review');
+      setReviewError(err.response?.data?.message || "Failed to submit review");
     },
   });
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
-    
+
     bookingMutation.mutate({
       packageId: pkg._id,
       persons: Number(bookingPersons),
@@ -114,7 +136,7 @@ const PackageDetails = () => {
       contactInfo: {
         name: user.name,
         email: user.email,
-        phone: user.phone || '+1234567890',
+        phone: user.phone || "+1234567890",
         message: bookingMessage,
       },
     });
@@ -134,11 +156,11 @@ const PackageDetails = () => {
   const handleReviewSubmit = (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     if (!reviewComment.trim()) {
-      setReviewError('Comment cannot be empty');
+      setReviewError("Comment cannot be empty");
       return;
     }
     reviewMutation.mutate({
@@ -146,13 +168,13 @@ const PackageDetails = () => {
       comment: reviewComment,
     });
   };
-  
+
   const handleWhatsAppBooking = () => {
-    const defaultNumber = import.meta.env.VITE_WHATSAPP_PHONE || '+1234567890';
+    const defaultNumber = import.meta.env.VITE_WHATSAPP_PHONE || "+1234567890";
     const message = encodeURIComponent(
-      `Hello 1ClickTravel, I would like to book the "${pkg.title}" package for ${bookingPersons} guest(s) on date ${bookingDate || 'TBD'}.`
+      `Hello 1ClickTravel, I would like to book the "${pkg.title}" package for ${bookingPersons} guest(s) on date ${bookingDate || "TBD"}.`,
     );
-    window.open(`https://wa.me/${defaultNumber}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${defaultNumber}?text=${message}`, "_blank");
   };
 
   if (isLoading) return <Loader fullPage />;
@@ -162,8 +184,14 @@ const PackageDetails = () => {
         <div className="text-center space-y-4">
           <ShieldAlert className="h-16 w-16 text-rose-500 mx-auto" />
           <h2 className="font-serif text-2xl font-bold">Package Not Found</h2>
-          <p className="text-slate-400">The package slug you entered could not be found or has been disabled.</p>
-          <Link to="/packages" className="inline-block bg-primary text-white px-6 py-2 rounded font-bold shadow-sm">
+          <p className="text-slate-400">
+            The package slug you entered could not be found or has been
+            disabled.
+          </p>
+          <Link
+            to="/packages"
+            className="inline-block bg-primary text-white px-6 py-2 rounded font-bold shadow-sm"
+          >
             Back to Packages
           </Link>
         </div>
@@ -172,20 +200,15 @@ const PackageDetails = () => {
   }
 
   const getImgUrl = (url) => {
-    if (!url) return '';
-    return url.startsWith('/uploads') ? `http://localhost:5001${url}` : url;
+    if (!url) return "";
+    return url.startsWith("/uploads") ? `http://localhost:5001${url}` : url;
   };
 
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-20 text-slate-850">
-      <Helmet>
-        <title>{pkg.seo?.title || `${pkg.title} | 1ClickTravel`}</title>
-        <meta
-          name="description"
-          content={pkg.seo?.description || pkg.overview}
-        />
-        <meta name="keywords" content={pkg.seo?.keywords} />
-      </Helmet>
+      <title>{pkg.seo?.title || `${pkg.title} | 1ClickTravel`}</title>
+      <meta name="description" content={pkg.seo?.description || pkg.overview} />
+      <meta name="keywords" content={pkg.seo?.keywords} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
@@ -232,11 +255,14 @@ const PackageDetails = () => {
             </p>
             <div className="flex items-baseline space-x-2">
               <span className="text-3xl font-extrabold text-slate-800">
-                ${pkg.discountedPrice || pkg.price}
+                ₹
+                {Number(pkg.discountedPrice || pkg.price).toLocaleString(
+                  "en-IN",
+                )}
               </span>
               {pkg.discountedPrice && (
                 <span className="text-sm text-slate-400 line-through">
-                  ${pkg.price}
+                  ₹{Number(pkg.price).toLocaleString("en-IN")}
                 </span>
               )}
             </div>
@@ -252,7 +278,7 @@ const PackageDetails = () => {
           <div className="lg:col-span-2 space-y-4">
             <div className="relative overflow-hidden rounded-lg border border-slate-200 aspect-[16/9] w-full bg-slate-100 shadow-sm">
               <img
-                src={getImgUrl(selectedImage)}
+                src={getImgUrl(activeImage)}
                 alt={pkg.title}
                 className="w-full h-full object-cover"
               />
@@ -262,9 +288,9 @@ const PackageDetails = () => {
             {pkg.images && pkg.images.length > 0 && (
               <div className="flex space-x-3 overflow-x-auto pb-1.5">
                 <button
-                  onClick={() => setSelectedImage(pkg.thumbnail)}
+                  onClick={() => setSelectedImage({ slug, url: pkg.thumbnail })}
                   className={`relative flex-shrink-0 h-16 w-24 rounded overflow-hidden border-2 cursor-pointer ${
-                    selectedImage === pkg.thumbnail
+                    activeImage === pkg.thumbnail
                       ? "border-primary"
                       : "border-slate-200"
                   }`}
@@ -278,9 +304,9 @@ const PackageDetails = () => {
                 {pkg.images.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setSelectedImage(img)}
+                    onClick={() => setSelectedImage({ slug, url: img })}
                     className={`relative flex-shrink-0 h-16 w-24 rounded overflow-hidden border-2 cursor-pointer ${
-                      selectedImage === img
+                      activeImage === img
                         ? "border-primary"
                         : "border-slate-200"
                     }`}
@@ -426,18 +452,18 @@ const PackageDetails = () => {
             {/* Tabs Headers */}
             <div className="flex border-b border-slate-200 overflow-x-auto">
               {[
-                { id: 'overview', name: 'Overview' },
-                { id: 'itinerary', name: 'Itinerary Plan' },
-                { id: 'inclusions', name: 'Inclusions' },
-                { id: 'hotels', name: 'Accommodation' },
+                { id: "overview", name: "Overview" },
+                { id: "itinerary", name: "Itinerary Plan" },
+                { id: "inclusions", name: "Inclusions" },
+                { id: "hotels", name: "Accommodation" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-3.5 px-4.5 sm:px-6 text-xs sm:text-sm font-semibold tracking-wide border-b-2 focus:outline-none transition-colors whitespace-nowrap cursor-pointer ${
                     activeTab === tab.id
-                      ? 'border-primary text-primary font-bold'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   {tab.name}
@@ -447,33 +473,43 @@ const PackageDetails = () => {
 
             {/* Tabs Contents */}
             <div className="bg-white border border-slate-200 p-6 rounded-lg min-h-[250px] shadow-sm">
-              {activeTab === 'overview' && (
+              {activeTab === "overview" && (
                 <div className="space-y-5">
-                  <h3 className="font-serif text-lg font-bold text-slate-800">About This Expedition</h3>
+                  <h3 className="font-serif text-lg font-bold text-slate-800">
+                    About This Expedition
+                  </h3>
                   <p className="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line font-medium">
                     {pkg.description}
                   </p>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4.5 border-t border-slate-100">
                     <div className="flex items-center space-x-3 text-slate-700">
                       <Hotel className="h-5 w-5 text-primary flex-shrink-0" />
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Accommodation</p>
-                        <p className="font-semibold text-xs text-slate-700">{pkg.hotelDetails || 'Premium boutique suites'}</p>
+                        <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                          Accommodation
+                        </p>
+                        <p className="font-semibold text-xs text-slate-700">
+                          {pkg.hotelDetails || "Premium boutique suites"}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3 text-slate-700">
                       <Truck className="h-5 w-5 text-primary flex-shrink-0" />
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Transportation</p>
-                        <p className="font-semibold text-xs text-slate-700">{pkg.transport || 'Chauffeured vehicle'}</p>
+                        <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                          Transportation
+                        </p>
+                        <p className="font-semibold text-xs text-slate-700">
+                          {pkg.transport || "Chauffeured vehicle"}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {activeTab === 'itinerary' && (
+              {activeTab === "itinerary" && (
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
                   {/* Day selection tabs */}
                   <div className="flex sm:flex-col overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 space-x-2 sm:space-x-0 sm:space-y-1.5 border-b sm:border-b-0 sm:border-r border-slate-100 pr-0 sm:pr-4">
@@ -483,42 +519,50 @@ const PackageDetails = () => {
                         onClick={() => setActiveItineraryDay(day.day)}
                         className={`flex-shrink-0 py-2 px-3 rounded text-left text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                           activeItineraryDay === day.day
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200/60'
+                            ? "bg-primary text-white shadow-sm"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200/60"
                         }`}
                       >
-                        Day {day.day} {day.meals ? `(${day.meals.join(', ')})` : ''}
+                        Day {day.day}{" "}
+                        {day.meals ? `(${day.meals.join(", ")})` : ""}
                       </button>
                     ))}
                   </div>
 
                   {/* Day description content */}
                   <div className="sm:col-span-3 space-y-3">
-                    {pkg.itinerary?.filter((d) => d.day === activeItineraryDay).map((day) => (
-                      <div key={day.day} className="space-y-3">
-                        <h4 className="font-serif text-base font-bold text-primary">
-                          Day {day.day} — {day.title}
-                        </h4>
-                        <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                          {day.description}
-                        </p>
-                        {day.meals?.length > 0 && (
-                          <div className="flex items-center space-x-2 pt-1 text-[10px]">
-                            <span className="text-slate-450 uppercase font-bold">Meals Included:</span>
-                            {day.meals.map((meal, index) => (
-                              <span key={index} className="bg-sky-50 text-primary px-2 py-0.5 rounded font-bold border border-sky-100">
-                                {meal}
+                    {pkg.itinerary
+                      ?.filter((d) => d.day === activeItineraryDay)
+                      .map((day) => (
+                        <div key={day.day} className="space-y-3">
+                          <h4 className="font-serif text-base font-bold text-primary">
+                            Day {day.day} — {day.title}
+                          </h4>
+                          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
+                            {day.description}
+                          </p>
+                          {day.meals?.length > 0 && (
+                            <div className="flex items-center space-x-2 pt-1 text-[10px]">
+                              <span className="text-slate-450 uppercase font-bold">
+                                Meals Included:
                               </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                              {day.meals.map((meal, index) => (
+                                <span
+                                  key={index}
+                                  className="bg-sky-50 text-primary px-2 py-0.5 rounded font-bold border border-sky-100"
+                                >
+                                  {meal}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}
 
-              {activeTab === 'inclusions' && (
+              {activeTab === "inclusions" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Inclusions */}
                   <div className="space-y-3.5">
@@ -554,7 +598,7 @@ const PackageDetails = () => {
                 </div>
               )}
 
-              {activeTab === 'hotels' && (
+              {activeTab === "hotels" && (
                 <div className="space-y-5">
                   <div>
                     <h4 className="text-slate-800 font-serif font-bold text-sm flex items-center space-x-2 mb-1.5">
@@ -562,7 +606,8 @@ const PackageDetails = () => {
                       <span>Premium Lodging Info</span>
                     </h4>
                     <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                      {pkg.hotelDetails || 'Our packages feature premium rated accommodations vetted personally for service quality, style, and comfort.'}
+                      {pkg.hotelDetails ||
+                        "Our packages feature premium rated accommodations vetted personally for service quality, style, and comfort."}
                     </p>
                   </div>
                   <div className="border-t border-slate-100 pt-5">
@@ -571,7 +616,8 @@ const PackageDetails = () => {
                       <span>Private Transit Info</span>
                     </h4>
                     <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-medium">
-                      {pkg.transport || 'All transfers, flights, speedboats, and yachts mentioned in the itinerary are covered. Guests enjoy private air-conditioned vehicles equipped with professional drivers.'}
+                      {pkg.transport ||
+                        "All transfers, flights, speedboats, and yachts mentioned in the itinerary are covered. Guests enjoy private air-conditioned vehicles equipped with professional drivers."}
                     </p>
                   </div>
                 </div>
@@ -586,18 +632,29 @@ const PackageDetails = () => {
 
               {/* Reviews List */}
               {pkg.reviews?.length === 0 ? (
-                <p className="text-slate-505 text-xs font-semibold">No reviews submitted yet. Be the first to share your experience!</p>
+                <p className="text-slate-505 text-xs font-semibold">
+                  No reviews submitted yet. Be the first to share your
+                  experience!
+                </p>
               ) : (
                 <div className="space-y-3.5">
                   {pkg.reviews.map((rev) => (
-                    <div key={rev._id} className="bg-white border border-slate-200/80 p-4.5 rounded-lg space-y-2 shadow-sm">
+                    <div
+                      key={rev._id}
+                      className="bg-white border border-slate-200/80 p-4.5 rounded-lg space-y-2 shadow-sm"
+                    >
                       <div className="flex justify-between items-center text-[10px] font-bold">
                         <span className="text-slate-700">{rev.userName}</span>
-                        <span className="text-slate-400">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                        <span className="text-slate-400">
+                          {new Date(rev.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
                       <div className="flex space-x-0.5 text-amber-400">
                         {[...Array(rev.rating)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400 stroke-none" />
+                          <Star
+                            key={i}
+                            className="h-3 w-3 fill-amber-400 text-amber-400 stroke-none"
+                          />
                         ))}
                       </div>
                       <p className="text-slate-600 text-xs leading-relaxed font-medium">
@@ -610,12 +667,16 @@ const PackageDetails = () => {
 
               {/* Submit a Review Form */}
               <div className="bg-white border border-slate-200 p-5 rounded-lg space-y-4 shadow-sm">
-                <h4 className="font-serif text-base font-bold text-slate-800">Write a Review</h4>
-                
+                <h4 className="font-serif text-base font-bold text-slate-800">
+                  Write a Review
+                </h4>
+
                 {isAuthenticated ? (
                   <form onSubmit={handleReviewSubmit} className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Your Rating</label>
+                      <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                        Your Rating
+                      </label>
                       <div className="flex space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -626,7 +687,9 @@ const PackageDetails = () => {
                           >
                             <Star
                               className={`h-5 w-5 ${
-                                star <= reviewRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'
+                                star <= reviewRating
+                                  ? "fill-amber-400 text-amber-400"
+                                  : "text-slate-300"
                               }`}
                             />
                           </button>
@@ -648,22 +711,31 @@ const PackageDetails = () => {
                       ></textarea>
                     </div>
 
-                    {reviewError && <p className="text-xs text-rose-500 font-semibold">{reviewError}</p>}
+                    {reviewError && (
+                      <p className="text-xs text-rose-500 font-semibold">
+                        {reviewError}
+                      </p>
+                    )}
 
                     <button
                       type="submit"
                       disabled={reviewMutation.isPending}
                       className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-5 rounded-md transition-colors text-xs uppercase tracking-wider cursor-pointer shadow-sm"
                     >
-                      {reviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                      {reviewMutation.isPending
+                        ? "Submitting..."
+                        : "Submit Review"}
                     </button>
                   </form>
                 ) : (
                   <p className="text-xs text-slate-500 font-medium">
-                    Please{' '}
-                    <Link to="/login" className="text-primary hover:underline font-bold">
+                    Please{" "}
+                    <Link
+                      to="/login"
+                      className="text-primary hover:underline font-bold"
+                    >
                       Sign In
-                    </Link>{' '}
+                    </Link>{" "}
                     to leave a package review.
                   </p>
                 )}
@@ -682,9 +754,12 @@ const PackageDetails = () => {
               {inquirySuccess ? (
                 <div className="bg-sky-50/50 border border-sky-100 p-5 rounded-md text-center space-y-3.5">
                   <Check className="h-10 w-10 text-primary mx-auto" />
-                  <h4 className="font-serif font-bold text-slate-800">Inquiry Received!</h4>
+                  <h4 className="font-serif font-bold text-slate-800">
+                    Inquiry Received!
+                  </h4>
                   <p className="text-xs text-slate-550 font-semibold">
-                    We have saved your question. A travel consultant will reply to your email address shortly.
+                    We have saved your question. A travel consultant will reply
+                    to your email address shortly.
                   </p>
                   <button
                     onClick={() => setInquirySuccess(false)}
@@ -696,7 +771,9 @@ const PackageDetails = () => {
               ) : (
                 <form onSubmit={handleInquirySubmit} className="space-y-3.5">
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">Name</label>
+                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">
+                      Name
+                    </label>
                     <input
                       type="text"
                       required
@@ -708,7 +785,9 @@ const PackageDetails = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">Email</label>
+                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">
+                      Email
+                    </label>
                     <input
                       type="email"
                       required
@@ -720,7 +799,9 @@ const PackageDetails = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">Phone Number</label>
+                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">
+                      Phone Number
+                    </label>
                     <input
                       type="text"
                       required
@@ -732,7 +813,9 @@ const PackageDetails = () => {
                   </div>
 
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">Message</label>
+                    <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block">
+                      Message
+                    </label>
                     <textarea
                       required
                       placeholder="Write your holiday inquiries..."
@@ -748,7 +831,7 @@ const PackageDetails = () => {
                     disabled={inquiryMutation.isPending}
                     className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-md transition-colors text-xs uppercase tracking-wider cursor-pointer shadow-sm"
                   >
-                    {inquiryMutation.isPending ? 'Sending...' : 'Send Inquiry'}
+                    {inquiryMutation.isPending ? "Sending..." : "Send Inquiry"}
                   </button>
                 </form>
               )}
@@ -764,18 +847,32 @@ const PackageDetails = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {similarPackages.map((pkg) => (
-                <div key={pkg._id} className="group relative bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col hover:shadow-soft transition-all duration-200">
-                  <img src={getImgUrl(pkg.thumbnail)} alt={pkg.title} className="w-full h-40 object-cover bg-slate-100" />
+                <div
+                  key={pkg._id}
+                  className="group relative bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col hover:shadow-soft transition-all duration-200"
+                >
+                  <img
+                    src={getImgUrl(pkg.thumbnail)}
+                    alt={pkg.title}
+                    className="w-full h-40 object-cover bg-slate-100"
+                  />
                   <div className="p-4 flex-grow flex flex-col justify-between space-y-3">
                     <div className="space-y-1">
-                      <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{pkg.category}</span>
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
+                        {pkg.category}
+                      </span>
                       <h4 className="font-serif font-bold text-slate-800 text-sm line-clamp-1 group-hover:text-primary transition-colors">
                         <Link to={`/packages/${pkg.slug}`}>{pkg.title}</Link>
                       </h4>
                     </div>
                     <div className="flex justify-between items-center pt-2.5 border-t border-slate-100">
-                      <span className="text-sm font-extrabold text-slate-800">${pkg.price}</span>
-                      <Link to={`/packages/${pkg.slug}`} className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">
+                      <span className="text-sm font-extrabold text-slate-800">
+                        ₹{Number(pkg.price).toLocaleString("en-IN")}
+                      </span>
+                      <Link
+                        to={`/packages/${pkg.slug}`}
+                        className="text-xs font-bold text-primary hover:text-primary-dark transition-colors"
+                      >
                         Details
                       </Link>
                     </div>
@@ -785,8 +882,9 @@ const PackageDetails = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
 };
+
+export default PackageDetails;
