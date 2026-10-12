@@ -119,6 +119,14 @@ export const googleAuth = asyncHandler(async (req, res) => {
     throw new Error("A verified Google account is required");
   }
 
+  const clientPhotoURL =
+    typeof req.body.photoURL === "string" &&
+    /^https:\/\/(?:[a-z0-9-]+\.)*googleusercontent\.com\//i.test(
+      req.body.photoURL,
+    )
+      ? req.body.photoURL
+      : "";
+  const googlePhotoURL = decodedToken.picture || clientPhotoURL;
   const email = decodedToken.email.toLowerCase();
   let user = await User.findOne({ firebaseUid: decodedToken.uid });
 
@@ -130,9 +138,7 @@ export const googleAuth = asyncHandler(async (req, res) => {
         res.status(409);
         throw new Error("This email is linked to a different Google account");
       }
-
       user.firebaseUid = decodedToken.uid;
-      if (!user.avatar && decodedToken.picture) user.avatar = decodedToken.picture;
       await user.save();
     } else {
       const isFirstUser = (await User.countDocuments({})) === 0;
@@ -142,10 +148,15 @@ export const googleAuth = asyncHandler(async (req, res) => {
         name: decodedToken.name || email.split("@")[0],
         email,
         firebaseUid: decodedToken.uid,
-        avatar: decodedToken.picture || "",
+        avatar: googlePhotoURL,
         role,
       });
     }
+  }
+
+  if (googlePhotoURL && user.avatar !== googlePhotoURL) {
+    user.avatar = googlePhotoURL;
+    await user.save();
   }
 
   const token = generateToken(res, user._id);

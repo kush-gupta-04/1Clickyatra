@@ -14,8 +14,14 @@ const GoogleAuthButton = ({ text, onError }) => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(firebaseAuth, provider);
       const idToken = await result.user.getIdToken();
-      const response = await API.post("/auth/google", { idToken });
-      const user = response.data.data;
+      const response = await API.post("/auth/google", {
+        idToken,
+        photoURL: result.user.photoURL,
+      });
+      const user = {
+        ...response.data.data,
+        avatar: result.user.photoURL || response.data.data.avatar || "",
+      };
       dispatch(authSuccess({ user, token: user.token }));
     } catch (error) {
       console.error("Google Auth error:", error);

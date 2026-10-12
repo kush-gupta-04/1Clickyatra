@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Login from "../../pages/Login";
 import Register from "../../pages/Register";
 import { logout } from "../../store/slices/authSlice";
-import API from "../../api/axios";
+import API, { getMediaUrl } from "../../api/axios";
 import {
   Menu,
   X,
@@ -120,11 +120,7 @@ const Navbar = () => {
                   >
                     {user.avatar ? (
                       <img
-                        src={
-                          user.avatar.startsWith("/uploads")
-                            ? `http://localhost:5001${user.avatar}`
-                            : user.avatar
-                        }
+                        src={getMediaUrl(user.avatar)}
                         alt={user.name}
                         className="h-8 w-8 rounded-full object-cover border border-slate-200"
                       />

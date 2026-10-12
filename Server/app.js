@@ -1,4 +1,6 @@
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 // import cors from "cors";
 // import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -19,6 +21,7 @@ import bookingRoutes from "./routes/bookings.js";
 import adminRoutes from "./routes/admin.js";
 
 const app = express();
+const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 // // Security Headers
 // app.use(
@@ -40,6 +43,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/uploads", express.static(path.join(serverDirectory, "uploads")));
 
 // // Rate limiting
 // const limiter = rateLimit({

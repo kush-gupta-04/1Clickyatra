@@ -16,7 +16,7 @@ import {
   Hotel,
   Truck,
 } from "lucide-react";
-import API from "../api/axios.js";
+import API, { getMediaUrl } from "../api/axios.js";
 import Loader from "../component/ui/Loader.jsx";
 import Breadcrumbs from "../component/ui/Breadcrumbs.jsx";
 
@@ -199,11 +199,6 @@ const PackageDetails = () => {
     );
   }
 
-  const getImgUrl = (url) => {
-    if (!url) return "";
-    return url.startsWith("/uploads") ? `http://localhost:5001${url}` : url;
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-20 text-slate-850">
       <title>{pkg.seo?.title || `${pkg.title} | 1ClickTravel`}</title>
@@ -278,7 +273,7 @@ const PackageDetails = () => {
           <div className="lg:col-span-2 space-y-4">
             <div className="relative overflow-hidden rounded-lg border border-slate-200 aspect-[16/9] w-full bg-slate-100 shadow-sm">
               <img
-                src={getImgUrl(activeImage)}
+                src={getMediaUrl(activeImage)}
                 alt={pkg.title}
                 className="w-full h-full object-cover"
               />
@@ -296,7 +291,7 @@ const PackageDetails = () => {
                   }`}
                 >
                   <img
-                    src={getImgUrl(pkg.thumbnail)}
+                    src={getMediaUrl(pkg.thumbnail)}
                     alt="thumbnail"
                     className="w-full h-full object-cover"
                   />
@@ -312,7 +307,7 @@ const PackageDetails = () => {
                     }`}
                   >
                     <img
-                      src={getImgUrl(img)}
+                      src={getMediaUrl(img)}
                       alt={`gallery-${idx}`}
                       className="w-full h-full object-cover"
                     />
@@ -852,7 +847,7 @@ const PackageDetails = () => {
                   className="group relative bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col hover:shadow-soft transition-all duration-200"
                 >
                   <img
-                    src={getImgUrl(pkg.thumbnail)}
+                    src={getMediaUrl(pkg.thumbnail)}
                     alt={pkg.title}
                     className="w-full h-40 object-cover bg-slate-100"
                   />

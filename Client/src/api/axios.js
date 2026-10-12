@@ -5,6 +5,15 @@ const API = axios.create({
   withCredentials: true, // Send cookies with requests
 });
 
+export const getMediaUrl = (url) => {
+  if (!url) return "";
+  if (!url.startsWith("/uploads")) return url;
+
+  const apiBaseURL = API.defaults.baseURL || "/api";
+  const apiOrigin = new URL(apiBaseURL, window.location.origin).origin;
+  return new URL(url, apiOrigin).toString();
+};
+
 // Interceptor to add Authorization Token
 API.interceptors.request.use(
   (config) => {

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Heart, Star, Calendar, MapPin, Users } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { setWishlist } from "../../store/slices/authSlice.js";
-import API from "../../api/axios.js";
+import API, { getMediaUrl } from "../../api/axios.js";
 import { useState } from "react";
 
 const PackageCard = ({ pkg }) => {
@@ -38,16 +38,12 @@ const PackageCard = ({ pkg }) => {
     }
   };
 
-  const getThumbnailSrc = (url) => {
-    if (!url) return "";
-    return url.startsWith("/uploads") ? `http://localhost:5001${url}` : url;
-  };
   return (
     <div className="group relative bg-white border border-slate-200/80 hover:border-slate-300 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-soft flex flex-col h-full">
       {/* Thumbnail */}
       <div className="relative overflow-hidden aspect-[4/3] w-full bg-slate-100">
         <img
-          src={getThumbnailSrc(pkg.thumbnail)}
+          src={getMediaUrl(pkg.thumbnail)}
           alt={pkg.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-103"
         />

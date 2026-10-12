@@ -165,7 +165,8 @@ const CreatePackage = () => {
 
       if (res.data.success) {
         setSuccessMsg("Package created successfully!");
-        setTimeout(() => navigate("/admin"), 1500);
+      } else {
+        throw new Error("The server did not confirm package creation.");
       }
     } catch (error) {
       setErrorMsg(
@@ -200,18 +201,34 @@ const CreatePackage = () => {
           </div>
 
           <div className="p-6 md:p-8">
-            {errorMsg && (
-              <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold rounded-md">
-                {errorMsg}
+            {successMsg ? (
+              <div className="space-y-5">
+                <div
+                  role="status"
+                  className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-600 text-sm font-semibold rounded-md"
+                >
+                  {successMsg}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin")}
+                  className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm"
+                >
+                  Back to Dashboard
+                </button>
               </div>
-            )}
-            {successMsg && (
-              <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-600 text-sm font-semibold rounded-md">
-                {successMsg}
-              </div>
-            )}
+            ) : (
+              <>
+                {errorMsg && (
+                  <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold rounded-md">
+                    {errorMsg}
+                  </div>
+                )}
 
-            <form onSubmit={handleSubmit} className="space-y-8 text-slate-900">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-8 text-slate-900"
+                >
               {/* Basic Info */}
               <div className="space-y-5">
                 <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">
@@ -573,19 +590,21 @@ const CreatePackage = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm flex items-center space-x-2"
-                >
-                  <Save className="h-4 w-4" />
-                  <span>
-                    {loading ? "Saving Package..." : "Create Package"}
-                  </span>
-                </button>
-              </div>
-            </form>
+                  <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm flex items-center space-x-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      <span>
+                        {loading ? "Saving Package..." : "Create Package"}
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </div>
         </div>
       </div>
