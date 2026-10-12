@@ -20,9 +20,13 @@ const AdminDashboard = () => {
 
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [statsError, setStatsError] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
+      setLoading(true);
+      setStatsError("");
+
       try {
         const res = await API.get("/admin/dashboard-stats", {
           headers: {
@@ -30,10 +34,16 @@ const AdminDashboard = () => {
           },
         });
         if (res.data.success) {
-          setStats(res.data.data);
+          setStats(res.data.data.counts);
+        } else {
+          setStatsError("Unable to load dashboard metrics.");
         }
       } catch (error) {
         console.error("Error fetching admin stats:", error);
+        setStatsError(
+          error.response?.data?.message ||
+            "Unable to load dashboard metrics. Please try again.",
+        );
       } finally {
         setLoading(false);
       }
@@ -87,68 +97,79 @@ const AdminDashboard = () => {
           </div>
         ) : (
           <>
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Total Users */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                  <Users className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                    Total Users
-                  </p>
-                  <p className="text-2xl font-black text-slate-800">
-                    {stats?.totalUsers || 0}
-                  </p>
-                </div>
+            {statsError ? (
+              <div
+                role="alert"
+                className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700"
+              >
+                {statsError}
               </div>
+            ) : (
+              <>
+                {/* Stats Overview */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Total Users */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        Total Users
+                      </p>
+                      <p className="text-2xl font-black text-slate-800">
+                        {stats?.users ?? 0}
+                      </p>
+                    </div>
+                  </div>
 
-              {/* Total Packages */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
-                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-                  <Map className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                    Packages
-                  </p>
-                  <p className="text-2xl font-black text-slate-800">
-                    {stats?.totalPackages || 0}
-                  </p>
-                </div>
-              </div>
+                  {/* Total Packages */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                      <Map className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        Packages
+                      </p>
+                      <p className="text-2xl font-black text-slate-800">
+                        {stats?.packages ?? 0}
+                      </p>
+                    </div>
+                  </div>
 
-              {/* Total Bookings */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
-                <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-                  <Calendar className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                    Bookings
-                  </p>
-                  <p className="text-2xl font-black text-slate-800">
-                    {stats?.totalBookings || 0}
-                  </p>
-                </div>
-              </div>
+                  {/* Total Bookings */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+                    <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                      <Calendar className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        Bookings
+                      </p>
+                      <p className="text-2xl font-black text-slate-800">
+                        {stats?.bookings ?? 0}
+                      </p>
+                    </div>
+                  </div>
 
-              {/* Total Revenue */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
-                <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
-                  <DollarSign className="h-6 w-6" />
+                  {/* Total Revenue */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center space-x-4">
+                    <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+                      <DollarSign className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                        Revenue
+                      </p>
+                      <p className="text-2xl font-black text-slate-800">
+                        ₹{stats?.revenue?.toLocaleString() ?? "0"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                    Revenue
-                  </p>
-                  <p className="text-2xl font-black text-slate-800">
-                    ₹{stats?.totalRevenue?.toLocaleString() || "0"}
-                  </p>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
 
             {/* Management Modules */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

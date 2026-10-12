@@ -211,7 +211,7 @@ const CreatePackage = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-8 text-slate-900">
               {/* Basic Info */}
               <div className="space-y-5">
                 <h2 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">

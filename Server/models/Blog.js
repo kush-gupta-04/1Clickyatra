@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const slug = require("slugify");
+import mongoose from "mongoose";
+import slugify from "slugify";
 
 const blogSchema = new mongoose.Schema({
   title: {
@@ -44,10 +44,10 @@ const blogSchema = new mongoose.Schema({
 });
 
 // Generate slug before saving
-blogSchema.pre("save", function (next) {
-  if (!this.isModified("title")) return next();
+blogSchema.pre("save", function () {
+  if (!this.isModified("title")) return;
   this.slug = slugify(this.title, { lower: true, strict: true });
-  next();
 });
 
-module.exports = mongoose.model("Blog", blogSchema);
+const Blog = mongoose.model("Blog", blogSchema);
+export default Blog;

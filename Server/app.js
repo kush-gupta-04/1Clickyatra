@@ -12,11 +12,11 @@ import { errorHandler } from "./middleware/error.js";
 import authRoutes from "./routes/auth.js";
 import inquiryRoutes from "./routes/inquiries.js";
 import packageRoutes from "./routes/packages.js";
-// import bookingRoutes from "./routes/bookings.js";
+import bookingRoutes from "./routes/bookings.js";
 // import blogRoutes from "./routes/blogs.js";
 // import inquiryRoutes from "./routes/inquiries.js";
 // import testimonialRoutes from "./routes/testimonials.js";
-// import adminRoutes from "./routes/admin.js";
+import adminRoutes from "./routes/admin.js";
 
 const app = express();
 
@@ -58,11 +58,11 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/packages", packageRoutes);
-// app.use("/api/bookings", bookingRoutes);
+app.use("/api/bookings", bookingRoutes);
 // app.use("/api/blogs", blogRoutes);
 // app.use("/api/inquiries", inquiryRoutes);
 // app.use("/api/testimonials", testimonialRoutes);
-// app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 // // Health check endpoint
 // app.get("/api/health", (req, res) => {

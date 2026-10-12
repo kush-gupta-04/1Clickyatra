@@ -15,15 +15,17 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
   const totalInquiries = await Inquiry.countDocuments({});
   const totalBlogs = await Blog.countDocuments({});
 
-  // Calculate total revenue from confirmed or paid bookings
-  const bookings = await Booking.find({
-    $or: [{ status: "confirmed" }, { paymentStatus: "paid" }],
-  }).populate("package", "price discountedPrice");
+  // Count revenue only from payments that have been collected.
+  const bookings = await Booking.find({ paymentStatus: "paid" }).populate(
+    "package",
+    "price discountedPrice",
+  );
 
   let totalRevenue = 0;
   bookings.forEach((booking) => {
     if (booking.package) {
-      const price = booking.package.discountedPrice || booking.package.price;
+      const price =
+        booking.package.discountedPrice ?? booking.package.price;
       totalRevenue += price * (booking.persons || 1);
     }
   });
