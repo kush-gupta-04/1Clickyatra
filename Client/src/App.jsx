@@ -27,6 +27,7 @@ import ProtectedRoute from "./component/routing/ProtectedRoute.jsx";
 
 import CreatePackage from "./pages/admin/CreatePackage.jsx";
 import CreateBlog from "./pages/admin/CreateBlog.jsx";
+import ManagePackages from "./pages/admin/ManagePackages.jsx";
 
 function App() {
   return (
@@ -54,8 +55,13 @@ function App() {
 
             <Route element={<ProtectedRoute adminOnly={true} />}>
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/packages" element={<ManagePackages />} />
               <Route
                 path="/admin/packages/create"
+                element={<CreatePackage />}
+              />
+              <Route
+                path="/admin/packages/:packageId/edit"
                 element={<CreatePackage />}
               />
               <Route path="/admin/blogs/create" element={<CreateBlog />} />

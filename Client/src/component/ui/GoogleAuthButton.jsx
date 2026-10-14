@@ -20,7 +20,7 @@ const GoogleAuthButton = ({ text, onError }) => {
       });
       const user = {
         ...response.data.data,
-        avatar: result.user.photoURL || response.data.data.avatar || "",
+        avatar: response.data.data.avatar || result.user.photoURL || "",
       };
       dispatch(authSuccess({ user, token: user.token }));
     } catch (error) {

@@ -180,16 +180,16 @@ const AdminDashboard = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Manage Packages */}
-                <Link to="/admin/packages/create" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
+                <Link to="/admin/packages" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-2 bg-emerald-100 text-emerald-700 rounded-md">
                       <Map className="h-5 w-5" />
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-bold text-slate-800">Add Package</h3>
+                  <h3 className="font-bold text-slate-800">Manage Packages</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">
-                    Create a new travel destination package.
+                    View, edit, or add travel packages.
                   </p>
                 </Link>
 

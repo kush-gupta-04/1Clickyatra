@@ -12,7 +12,18 @@ export const getPackages = asyncHandler(async (req, res) => {
   const reqQuery = { ...req.query };
 
   // Fields to exclude from filtering
-  const removeFields = ["select", "sort", "page", "limit", "search"];
+  const removeFields = [
+    "select",
+    "sort",
+    "page",
+    "limit",
+    "search",
+    "minPrice",
+    "maxPrice",
+    "duration",
+    "category",
+    "featured",
+  ];
   removeFields.forEach((param) => delete reqQuery[param]);
 
   // Create query string
@@ -120,7 +131,40 @@ export const getPackages = asyncHandler(async (req, res) => {
 // @route   GET /api/packages/:slug
 // @access  Public
 export const getPackageBySlug = asyncHandler(async (req, res) => {
-  const travelPackage = await Package.findOne({ slug: req.params.slug });
+  const travelPackage = await Package.findOne({
+    slug: req.params.slug,
+    status: "published",
+  });
+
+  if (!travelPackage) {
+    res.status(404);
+    throw new Error("Package not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    data: travelPackage,
+  });
+});
+
+// @desc    Get all packages for admin management
+// @route   GET /api/packages/admin
+// @access  Private/Admin
+export const getAdminPackages = asyncHandler(async (_req, res) => {
+  const packages = await Package.find().sort("-createdAt");
+
+  res.status(200).json({
+    success: true,
+    count: packages.length,
+    data: packages,
+  });
+});
+
+// @desc    Get a package by ID for admin editing
+// @route   GET /api/packages/admin/:id
+// @access  Private/Admin
+export const getAdminPackageById = asyncHandler(async (req, res) => {
+  const travelPackage = await Package.findById(req.params.id);
 
   if (!travelPackage) {
     res.status(404);
@@ -147,6 +191,7 @@ export const createPackage = asyncHandler(async (req, res) => {
   if (typeof body.itinerary === "string")
     body.itinerary = JSON.parse(body.itinerary);
   if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
+  if (body.discountedPrice === "") body.discountedPrice = null;
 
   // Handle image uploads
   let thumbnail = "";
@@ -196,6 +241,7 @@ export const updatePackage = asyncHandler(async (req, res) => {
   if (typeof body.itinerary === "string")
     body.itinerary = JSON.parse(body.itinerary);
   if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
+  if (body.discountedPrice === "") body.discountedPrice = null;
 
   // Handle file uploads
   if (req.files) {
@@ -216,10 +262,8 @@ export const updatePackage = asyncHandler(async (req, res) => {
     }
   }
 
-  travelPackage = await Package.findByIdAndUpdate(req.params.id, body, {
-    new: true,
-    runValidators: true,
-  });
+  travelPackage.set(body);
+  await travelPackage.save();
 
   res.status(200).json({
     success: true,

@@ -1,11 +1,15 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
-import API from "../../api/axios";
+import API, { getMediaUrl } from "../../api/axios";
 
 const CreatePackage = () => {
   const navigate = useNavigate();
+  const { packageId } = useParams();
+  const isEditing = Boolean(packageId);
   const [loading, setLoading] = useState(false);
+  const [packageLoading, setPackageLoading] = useState(isEditing);
+  const [packageLoadFailed, setPackageLoadFailed] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -39,6 +43,66 @@ const CreatePackage = () => {
   const [images, setImages] = useState([]);
 
   const [thumbnailPreview, setThumbnailPreview] = useState("");
+
+  useEffect(() => {
+    if (!packageId) return;
+
+    const loadPackage = async () => {
+      setPackageLoading(true);
+      setPackageLoadFailed(false);
+      setErrorMsg("");
+
+      try {
+        const res = await API.get(`/packages/admin/${packageId}`);
+        const travelPackage = res.data.data;
+
+        if (!res.data.success || !travelPackage) {
+          throw new Error("Unable to load this package.");
+        }
+
+        setFormData({
+          title: travelPackage.title || "",
+          destination: travelPackage.destination || "",
+          duration: travelPackage.duration || "",
+          category: travelPackage.category || "",
+          overview: travelPackage.overview || "",
+          description: travelPackage.description || "",
+          price: travelPackage.price ?? "",
+          discountedPrice: travelPackage.discountedPrice ?? "",
+          hotelDetails: travelPackage.hotelDetails || "",
+          transport: travelPackage.transport || "",
+          groupSize: travelPackage.groupSize || "Any",
+          featured: Boolean(travelPackage.featured),
+          status: travelPackage.status || "draft",
+          seoTitle: travelPackage.seo?.title || "",
+          seoDesc: travelPackage.seo?.description || "",
+          seoKeywords: travelPackage.seo?.keywords || "",
+        });
+        setInclusions(travelPackage.inclusions?.length ? travelPackage.inclusions : [""]);
+        setExclusions(travelPackage.exclusions?.length ? travelPackage.exclusions : [""]);
+        setItinerary(
+          travelPackage.itinerary?.length
+            ? travelPackage.itinerary.map((day) => ({
+                ...day,
+                meals: Array.isArray(day.meals) ? day.meals.join(", ") : "",
+              }))
+            : [{ day: 1, title: "", description: "", meals: "" }],
+        );
+        setThumbnailPreview(getMediaUrl(travelPackage.thumbnail));
+      } catch (error) {
+        setPackageLoadFailed(true);
+        setErrorMsg(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to load package",
+        );
+      } finally {
+        setPackageLoading(false);
+      }
+    };
+
+    loadPackage();
+  }, [packageId]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -140,16 +204,11 @@ const CreatePackage = () => {
         description: formData.seoDesc,
         keywords: formData.seoKeywords,
       };
-      // Usually backend accepts seo as object or JSON string.
-      // The backend packageController might need logic to parse it. If it doesn't parse, we can skip or send as string.
-      // packageController doesn't have JSON.parse for SEO in standard format, but let's assume it accepts object notation via bracket syntax, or we just skip it if backend doesn't handle it well.
-      // I'll skip complex bracket serialization and send string if backend handles it, but let's just ignore SEO if it's too complex or send it as json string.
-      // Looking at the package model, seo is an object.
       data.append("seo", JSON.stringify(seoData));
 
       if (thumbnail) {
         data.append("thumbnail", thumbnail);
-      } else {
+      } else if (!isEditing) {
         throw new Error("Thumbnail is required");
       }
 
@@ -159,20 +218,31 @@ const CreatePackage = () => {
         });
       }
 
-      const res = await API.post("/packages", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const request = isEditing
+        ? API.put(`/packages/${packageId}`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          })
+        : API.post("/packages", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+      const res = await request;
 
       if (res.data.success) {
-        setSuccessMsg("Package created successfully!");
+        setSuccessMsg(
+          isEditing
+            ? "Package updated successfully!"
+            : "Package created successfully!",
+        );
       } else {
-        throw new Error("The server did not confirm package creation.");
+        throw new Error(
+          `The server did not confirm package ${isEditing ? "update" : "creation"}.`,
+        );
       }
     } catch (error) {
       setErrorMsg(
         error.response?.data?.message ||
           error.message ||
-          "Failed to create package",
+          `Failed to ${isEditing ? "update" : "create"} package`,
       );
     } finally {
       setLoading(false);
@@ -193,10 +263,12 @@ const CreatePackage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
             <h1 className="font-serif text-2xl md:text-3xl font-bold text-slate-800">
-              Create New Package
+              {isEditing ? "Edit Package" : "Create New Package"}
             </h1>
             <p className="text-slate-500 text-sm mt-1 font-medium">
-              Add a new travel destination package to the platform.
+              {isEditing
+                ? "Update the details of this travel package."
+                : "Add a new travel destination package to the platform."}
             </p>
           </div>
 
@@ -211,10 +283,30 @@ const CreatePackage = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => navigate("/admin")}
+                  onClick={() => navigate("/admin/packages")}
                   className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm"
                 >
-                  Back to Dashboard
+                  Back to Packages
+                </button>
+              </div>
+            ) : packageLoading ? (
+              <p className="py-8 text-center text-sm font-medium text-slate-500">
+                Loading package...
+              </p>
+            ) : packageLoadFailed ? (
+              <div className="space-y-5">
+                <div
+                  role="alert"
+                  className="p-4 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-semibold rounded-md"
+                >
+                  {errorMsg}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/packages")}
+                  className="bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-8 rounded-md transition-colors text-sm"
+                >
+                  Back to Packages
                 </button>
               </div>
             ) : (
@@ -323,6 +415,11 @@ const CreatePackage = () => {
                       placeholder="Optional"
                     />
                   </div>
+                  {isEditing && !thumbnail && (
+                    <p className="text-xs text-slate-500">
+                      Leave empty to keep the current thumbnail.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -526,7 +623,7 @@ const CreatePackage = () => {
                       )}
                       <input
                         type="file"
-                        required
+                        required={!isEditing}
                         accept="image/*"
                         onChange={handleThumbnailChange}
                         className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
@@ -547,6 +644,11 @@ const CreatePackage = () => {
                     <p className="text-xs text-slate-500 mt-1">
                       {images.length} files selected
                     </p>
+                    {isEditing && (
+                      <p className="text-xs text-slate-500">
+                        Uploading images replaces the current gallery. Leave empty to keep it.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -598,7 +700,13 @@ const CreatePackage = () => {
                     >
                       <Save className="h-4 w-4" />
                       <span>
-                        {loading ? "Saving Package..." : "Create Package"}
+                        {loading
+                          ? isEditing
+                            ? "Updating Package..."
+                            : "Saving Package..."
+                          : isEditing
+                            ? "Update Package"
+                            : "Create Package"}
                       </span>
                     </button>
                   </div>

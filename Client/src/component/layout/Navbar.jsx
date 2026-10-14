@@ -118,17 +118,20 @@ const Navbar = () => {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center space-x-2 focus:outline-none cursor-pointer"
                   >
-                    {user.avatar ? (
-                      <img
-                        src={getMediaUrl(user.avatar)}
-                        alt={user.name}
-                        className="h-8 w-8 rounded-full object-cover border border-slate-200"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200">
-                        <User className="h-4 w-4 text-slate-500" />
-                      </div>
-                    )}
+                    <div className="relative h-8 w-8 shrink-0 rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center">
+                      <User className="h-4 w-4 text-slate-500" />
+                      {user.avatar && (
+                        <img
+                          src={getMediaUrl(user.avatar)}
+                          alt={user.name}
+                          referrerPolicy="no-referrer"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                          className="absolute inset-0 h-full w-full rounded-full object-cover"
+                        />
+                      )}
+                    </div>
                     <span className="text-sm font-semibold text-slate-700 hover:text-primary max-w-[100px] truncate">
                       {user.name.split(" ")[0]}
                     </span>
