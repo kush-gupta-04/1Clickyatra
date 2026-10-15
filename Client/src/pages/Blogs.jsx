@@ -1,103 +1,8 @@
 import Breadcrumbs from "../component/ui/Breadcrumbs.jsx";
+import { articles, categories } from "../data/blogArticles.js";
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, Clock3, MapPin, Star } from "lucide-react";
-
-const articles = [
-  {
-    id: 1,
-    title: "7 hidden beaches in Goa that feel like a private escape",
-    category: "Travel Guide",
-    readTime: "5 min read",
-    location: "Goa, India",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "Swap crowded shorelines for tucked-away coves, sunset spots, and calm turquoise water that feels made for slow travel.",
-    details:
-      "From sunrise swims to tiny beach shacks and hidden coves, Goa reveals a slower side of itself when you step beyond the busy tourist strips. This guide helps you discover peaceful stretches of sand, subtle local culture, and easy ways to enjoy the coast without the crowds.",
-    badge: "Editors' Pick",
-  },
-  {
-    id: 2,
-    title: "How to plan a luxury Himalayan getaway without the stress",
-    category: "Adventure Guide",
-    readTime: "6 min read",
-    location: "Himachal, India",
-    image:
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "From scenic stays to local experiences, here is a simple route to enjoy mountain luxury while keeping your itinerary light.",
-    details:
-      "A smooth mountain holiday is all about balancing views, comfort, and movement. Choose a strong base, cluster nearby experiences, and leave room for slow mornings, scenic drives, and hidden cafes in the hills.",
-    badge: "Luxury Escape",
-  },
-  {
-    id: 3,
-    title: "The ultimate 3-day Rajasthan itinerary for first-time visitors",
-    category: "Bespoke Guide",
-    readTime: "4 min read",
-    location: "Jaipur, Rajasthan",
-    image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "Discover forts, royal dining, desert sunsets, and cultural moments that turn a short trip into a memorable story.",
-    details:
-      "Rajasthan rewards travellers who mix architecture, heritage, and local flavour. You can build a memorable first trip with a city stay, a heritage evening, and a sunset experience that feels iconic without feeling rushed.",
-    badge: "Culture Trail",
-  },
-  {
-    id: 4,
-    title:
-      "Packing smarter for tropical trips: essentials that actually matter",
-    category: "Travel Tips",
-    readTime: "3 min read",
-    location: "Kerala, India",
-    image:
-      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "A practical packing list for beach holidays, island transfers, and warm-weather adventures with fewer last-minute surprises.",
-    details:
-      "Smart packing means choosing lighter layers, comfort-first footwear, and a few versatile pieces that can move from beach hours to city evenings. It is about preparing for climate, transport, and spontaneous plans.",
-    badge: "Smart Packing",
-  },
-  {
-    id: 5,
-    title: "Why slow travel is the best way to experience Bhutan",
-    category: "Safari Tips",
-    readTime: "7 min read",
-    location: "Bhutan",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "Enjoy monasteries, mountain roads, and local culture without rushing your journey with a slower, calmer travel rhythm.",
-    details:
-      "Bhutan feels best when you let the pace be gentle and the experiences personal. Slow travel helps you notice quiet valleys, local rhythms, and the deeper stories behind each destination.",
-    badge: "Slow Travel",
-  },
-  {
-    id: 6,
-    title: "Weekend escapes near Delhi for quick nature resets",
-    category: "Travel Guide",
-    readTime: "5 min read",
-    location: "Near Delhi",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    excerpt:
-      "Easy, scenic getaways for a short break filled with fresh air, village stays, and stunning views without long travel hours.",
-    details:
-      "The best quick getaways often blend a calm stay, a scenic drive, and a simple local experience. These nearby escapes are ideal for a reset when you need nature without a long-haul itinerary.",
-    badge: "Quick Break",
-  },
-];
-
-const categories = [
-  "All Posts",
-  "Travel Guide",
-  "Adventure Guide",
-  "Bespoke Guide",
-  "Travel Tips",
-  "Safari Tips",
-];
 
 const Blogs = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Posts");
@@ -187,13 +92,13 @@ const Blogs = () => {
                   <MapPin className="h-4 w-4 text-primary" />
                   {activeArticle.location}
                 </div>
-                <button
-                  type="button"
+                <Link
+                  to={`/blogs/${activeArticle.slug}`}
                   className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
                 >
                   Read article
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Link>
               </div>
             </div>
           </article>
@@ -281,14 +186,13 @@ const Blogs = () => {
                       <MapPin className="h-4 w-4 text-primary" />
                       {article.location}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveArticle(article)}
+                    <Link
+                      to={`/blogs/${article.slug}`}
                       className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition hover:text-primary-dark"
                     >
                       View article
                       <ArrowRight className="h-4 w-4" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </article>

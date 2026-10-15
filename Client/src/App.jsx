@@ -17,6 +17,7 @@ import Home from "./pages/Home.jsx";
 import Packages from "./pages/Packages.jsx";
 import PackageDetails from "./pages/PackageDetails.jsx";
 import Blogs from "./pages/Blogs.jsx";
+import BlogArticle from "./pages/BlogArticle.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 import Login from "./pages/Login.jsx";
@@ -43,6 +44,7 @@ function App() {
             <Route path="/packages" element={<Packages />} />
             <Route path="/packages/:slug" element={<PackageDetails />} />
             <Route path="/blogs" element={<Blogs />} />
+            <Route path="/blogs/:slug" element={<BlogArticle />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
