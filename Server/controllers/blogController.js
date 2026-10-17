@@ -1,4 +1,5 @@
 import Blog from "../models/Blog.js";
+import slugify from "slugify";
 import { asyncHandler } from "../middleware/error.js";
 import { uploadImage } from "../utils/fileUpload.js";
 
@@ -101,6 +102,9 @@ export const updateBlog = asyncHandler(async (req, res) => {
 
   if (req.file) {
     body.thumbnail = await uploadImage(req.file, "blog_thumbnails");
+  }
+  if (body.title) {
+    body.slug = slugify(body.title, { lower: true, strict: true });
   }
 
   blog = await Blog.findByIdAndUpdate(req.params.id, body, {

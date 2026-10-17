@@ -193,17 +193,17 @@ const AdminDashboard = () => {
                   </p>
                 </Link>
 
-                {/* Add Blog */}
-                <Link to="/admin/blogs/create" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
+                {/* Manage Blogs */}
+                <Link to="/admin/blogs" className="border border-slate-100 bg-slate-50 rounded-lg p-5 hover:bg-white hover:shadow-md transition-all cursor-pointer group block">
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-2 bg-rose-100 text-rose-700 rounded-md">
                       <Settings className="h-5 w-5" />
                     </div>
                     <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-bold text-slate-800">Add Blog</h3>
+                  <h3 className="font-bold text-slate-800">Manage Blogs</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">
-                    Publish a new article for the travel blog.
+                    Create, edit, or delete travel blog articles.
                   </p>
                 </Link>
 
