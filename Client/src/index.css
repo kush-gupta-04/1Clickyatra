@@ -38,12 +38,53 @@
   border-image: linear-gradient(to right, #0284c7, #38bdf8, #e0f2fe) 1;
 }
 
+@keyframes featured-packages-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 body {
   background-color: #ffffff;
   color: #1e293b;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+.featured-packages-marquee {
+  overflow: hidden;
+}
+
+.featured-packages-track,
+.featured-packages-group {
+  display: flex;
+  width: max-content;
+}
+
+.featured-packages-track {
+  animation: featured-packages-scroll 36s linear infinite;
+}
+
+.featured-packages-group {
+  gap: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.featured-packages-item {
+  flex: 0 0 clamp(280px, 30vw, 360px);
+}
+
+@media (max-width: 640px) {
+  .featured-packages-item {
+    flex-basis: min(82vw, 340px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-packages-track {
+    animation-duration: 72s;
+  }
 }
 
 /* Custom Scrollbar */

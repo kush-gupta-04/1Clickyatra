@@ -142,6 +142,7 @@ const Navbar = () => {
                       {user.role === "admin" && (
                         <Link
                           to="/admin"
+                          onClick={() => setDropdownOpen(false)}
                           className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary font-medium"
                         >
                           <LayoutDashboard className="h-4 w-4 mr-2 text-slate-500" />
@@ -150,6 +151,7 @@ const Navbar = () => {
                       )}
                       <Link
                         to="/dashboard"
+                        onClick={() => setDropdownOpen(false)}
                         className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary font-medium"
                       >
                         <User className="h-4 w-4 mr-2 text-slate-500" />

@@ -242,14 +242,29 @@ const Home = () => {
           {loadingPkgs ? (
             <Loader />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredPackages &&
-                featuredPackages.map((pkg) => (
-                  <div key={pkg._id}>
-                    <PackageCard pkg={pkg} />
-                  </div>
-                ))}
-            </div>
+            featuredPackages?.length > 0 && (
+              <div className="featured-packages-marquee">
+                <div className="featured-packages-track">
+                  {[0, 1].map((copy) => (
+                    <div
+                      key={copy}
+                      className="featured-packages-group"
+                      aria-hidden={copy === 1}
+                      inert={copy === 1}
+                    >
+                      {featuredPackages.map((pkg) => (
+                        <div
+                          key={pkg._id}
+                          className="featured-packages-item"
+                        >
+                          <PackageCard pkg={pkg} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
           )}
         </div>
       </section>
