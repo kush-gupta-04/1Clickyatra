@@ -448,7 +448,7 @@ const PackageDetails = () => {
             <div className="flex border-b border-slate-200 overflow-x-auto">
               {[
                 { id: "overview", name: "Overview" },
-                { id: "itinerary", name: "Itinerary Plan" },
+                { id: "itinerary", name: "Tour Plan" },
                 { id: "inclusions", name: "Inclusions" },
                 { id: "hotels", name: "Accommodation" },
               ].map((tab) => (

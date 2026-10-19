@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -15,12 +15,29 @@ import PackageCard from "../component/ui/PackageCard.jsx";
 import Loader from "../component/ui/Loader.jsx";
 import API from "../api/axios.js";
 
+const heroSlides = [
+  "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=1920",
+  "https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?auto=format&fit=crop&q=80&w=1920",
+  "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?auto=format&fit=crop&q=80&w=1920",
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [durationFilter, setDurationFilter] = useState("");
   const [activeFaq, setActiveFaq] = useState(null);
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveHeroSlide(
+        (currentSlide) => (currentSlide + 1) % heroSlides.length,
+      );
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   // Fetch Featured Packages
   const { data: featuredPackages, isLoading: loadingPkgs } = useQuery({
@@ -92,13 +109,19 @@ const Home = () => {
     <div className="relative w-full bg-white text-slate-800">
       {/* 1. Clean Modern Hero Section */}
       <div className="relative min-h-[100vh] flex items-center justify-center bg-slate-900 overflow-hidden pt-16">
-        {/* Scenic Background Image */}
+        {/* Scenic Background Slideshow */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=1920"
-            alt="Scenic Travel Hero Background"
-            className="w-full h-full object-cover opacity-75"
-          />
+          {heroSlides.map((image, index) => (
+            <img
+              key={image}
+              src={image}
+              alt=""
+              aria-hidden="true"
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                activeHeroSlide === index ? "opacity-75" : "opacity-0"
+              }`}
+            />
+          ))}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent"></div>
         </div>
 
@@ -174,6 +197,26 @@ const Home = () => {
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
+        </div>
+        <div
+          className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 gap-2"
+          role="group"
+          aria-label="Hero slides"
+        >
+          {heroSlides.map((image, index) => (
+            <button
+              key={image}
+              type="button"
+              onClick={() => setActiveHeroSlide(index)}
+              aria-label={`Show hero slide ${index + 1}`}
+              aria-pressed={activeHeroSlide === index}
+              className={`h-2.5 rounded-full transition-all ${
+                activeHeroSlide === index
+                  ? "w-8 bg-white"
+                  : "w-2.5 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
         </div>
       </div>
 

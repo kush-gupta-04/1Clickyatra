@@ -23,7 +23,7 @@ const About = () => {
 
   const stats = [
     { value: "10+", label: "Years of Excellence", icon: Star },
-    { value: "5,000+", label: "Happy Travelers", icon: Users },
+    { value: "1,000+", label: "Happy Travelers", icon: Users },
     { value: "50+", label: "Global Destinations", icon: MapPin },
     { value: "24/7", label: "Concierge Support", icon: Heart },
   ];
