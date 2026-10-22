@@ -49,15 +49,12 @@ const userSchema = new mongoose.Schema(
         ref: "Package",
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
+  // timestamps: true auto-adds createdAt + updatedAt — no need to define manually
   { timestamps: true },
 );
 
-// Hash password before saving(middleware hook that runs before saving a user document to the database  )
+// Hash password before saving
 userSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
 

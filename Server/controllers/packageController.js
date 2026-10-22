@@ -2,6 +2,26 @@ import Package from "../models/Package.js";
 import { asyncHandler } from "../middleware/error.js";
 import { uploadImage, uploadImages } from "../utils/fileUpload.js";
 
+// Helper: safely parse stringified JSON fields from multipart form bodies
+const parseBodyFields = (body, res) => {
+  try {
+    if (typeof body.inclusions === "string")
+      body.inclusions = JSON.parse(body.inclusions);
+    if (typeof body.exclusions === "string")
+      body.exclusions = JSON.parse(body.exclusions);
+    if (typeof body.itinerary === "string")
+      body.itinerary = JSON.parse(body.itinerary);
+    if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
+  } catch {
+    res.status(400);
+    throw new Error(
+      "Invalid JSON in form fields (inclusions, exclusions, itinerary, seo)",
+    );
+  }
+  if (body.discountedPrice === "") body.discountedPrice = null;
+  return body;
+};
+
 // @desc    Get all packages with filtering, searching, sorting and pagination
 // @route   GET /api/packages
 // @access  Public
@@ -35,12 +55,12 @@ export const getPackages = asyncHandler(async (req, res) => {
     (match) => `$${match}`,
   );
 
-  // Find resource
   let parsedQuery = JSON.parse(queryStr);
 
-  // Apply search keyword filter
+  // Apply search keyword filter — escape input to prevent ReDoS
   if (req.query.search) {
-    const searchRegex = new RegExp(req.query.search, "i");
+    const escaped = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const searchRegex = new RegExp(escaped, "i");
     parsedQuery.$or = [
       { title: searchRegex },
       { destination: searchRegex },
@@ -48,24 +68,28 @@ export const getPackages = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Price filter handling
+  // Price filter
   if (req.query.minPrice || req.query.maxPrice) {
     parsedQuery.price = {};
     if (req.query.minPrice) parsedQuery.price.$gte = Number(req.query.minPrice);
     if (req.query.maxPrice) parsedQuery.price.$lte = Number(req.query.maxPrice);
   }
 
-  // Duration filter (e.g. number of days or search term)
+  // Duration filter
   if (req.query.duration) {
-    parsedQuery.duration = new RegExp(req.query.duration, "i");
+    const escapedDuration = req.query.duration.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
+    parsedQuery.duration = new RegExp(escapedDuration, "i");
   }
 
-  // Categories (e.g. Honeymoon, Luxury)
+  // Category filter
   if (req.query.category) {
     parsedQuery.category = req.query.category;
   }
 
-  // Featured check
+  // Featured filter
   if (req.query.featured) {
     parsedQuery.featured = req.query.featured === "true";
   }
@@ -100,22 +124,15 @@ export const getPackages = asyncHandler(async (req, res) => {
 
   query = query.skip(startIndex).limit(limit);
 
-  // Executing query
   const packages = await query;
 
   // Pagination result
   const pagination = {};
   if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit,
-    };
+    pagination.next = { page: page + 1, limit };
   }
   if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit,
-    };
+    pagination.prev = { page: page - 1, limit };
   }
 
   res.status(200).json({
@@ -129,11 +146,15 @@ export const getPackages = asyncHandler(async (req, res) => {
 
 // @desc    Get single package by slug
 // @route   GET /api/packages/:slug
-// @access  Public
+// @access  Public (admins can preview drafts)
 export const getPackageBySlug = asyncHandler(async (req, res) => {
+  // Admins can preview draft packages; public users can only see published ones
+  const statusFilter =
+    req.user?.role === "admin" ? {} : { status: "published" };
+
   const travelPackage = await Package.findOne({
     slug: req.params.slug,
-    status: "published",
+    ...statusFilter,
   });
 
   if (!travelPackage) {
@@ -147,15 +168,25 @@ export const getPackageBySlug = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get all packages for admin management
+// @desc    Get all packages for admin management (with pagination)
 // @route   GET /api/packages/admin
 // @access  Private/Admin
-export const getAdminPackages = asyncHandler(async (_req, res) => {
-  const packages = await Package.find().sort("-createdAt");
+export const getAdminPackages = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 20;
+  const startIndex = (page - 1) * limit;
+
+  const total = await Package.countDocuments();
+  const packages = await Package.find()
+    .sort("-createdAt")
+    .skip(startIndex)
+    .limit(limit);
 
   res.status(200).json({
     success: true,
     count: packages.length,
+    total,
+    page,
     data: packages,
   });
 });
@@ -181,17 +212,7 @@ export const getAdminPackageById = asyncHandler(async (req, res) => {
 // @route   POST /api/packages
 // @access  Private/Admin
 export const createPackage = asyncHandler(async (req, res) => {
-  // Parse JSON fields from multi-part form body if sent as strings
-  const body = { ...req.body };
-
-  if (typeof body.inclusions === "string")
-    body.inclusions = JSON.parse(body.inclusions);
-  if (typeof body.exclusions === "string")
-    body.exclusions = JSON.parse(body.exclusions);
-  if (typeof body.itinerary === "string")
-    body.itinerary = JSON.parse(body.itinerary);
-  if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
-  if (body.discountedPrice === "") body.discountedPrice = null;
+  const body = parseBodyFields({ ...req.body }, res);
 
   // Handle image uploads
   let thumbnail = "";
@@ -224,24 +245,14 @@ export const createPackage = asyncHandler(async (req, res) => {
 // @route   PUT /api/packages/:id
 // @access  Private/Admin
 export const updatePackage = asyncHandler(async (req, res) => {
-  let travelPackage = await Package.findById(req.params.id);
+  const travelPackage = await Package.findById(req.params.id);
 
   if (!travelPackage) {
     res.status(404);
     throw new Error("Package not found");
   }
 
-  const body = { ...req.body };
-
-  // Parse JSON fields if they are stringified
-  if (typeof body.inclusions === "string")
-    body.inclusions = JSON.parse(body.inclusions);
-  if (typeof body.exclusions === "string")
-    body.exclusions = JSON.parse(body.exclusions);
-  if (typeof body.itinerary === "string")
-    body.itinerary = JSON.parse(body.itinerary);
-  if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
-  if (body.discountedPrice === "") body.discountedPrice = null;
+  const body = parseBodyFields({ ...req.body }, res);
 
   // Handle file uploads
   if (req.files) {
@@ -253,12 +264,11 @@ export const updatePackage = asyncHandler(async (req, res) => {
     }
     if (req.files.images) {
       const newImages = await uploadImages(req.files.images, "package_gallery");
-      // If client wants to append images instead of overwrite:
-      if (req.body.appendImages === "true") {
-        body.images = [...travelPackage.images, ...newImages];
-      } else {
-        body.images = newImages;
-      }
+      // Append images if client requests it, otherwise overwrite
+      body.images =
+        req.body.appendImages === "true"
+          ? [...travelPackage.images, ...newImages]
+          : newImages;
     }
   }
 
@@ -321,7 +331,7 @@ export const addPackageReview = asyncHandler(async (req, res) => {
 
   travelPackage.reviews.push(review);
 
-  // Recalculate average ratings
+  // Recalculate average rating
   travelPackage.ratings =
     travelPackage.reviews.reduce((acc, item) => item.rating + acc, 0) /
     travelPackage.reviews.length;

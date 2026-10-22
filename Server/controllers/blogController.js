@@ -1,5 +1,4 @@
 import Blog from "../models/Blog.js";
-import slugify from "slugify";
 import { asyncHandler } from "../middleware/error.js";
 import { uploadImage } from "../utils/fileUpload.js";
 
@@ -11,9 +10,11 @@ export const getBlogs = asyncHandler(async (req, res) => {
   const queryObj = {};
 
   if (search) {
+    // Escape user input to prevent ReDoS
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     queryObj.$or = [
-      { title: new RegExp(search, "i") },
-      { content: new RegExp(search, "i") },
+      { title: new RegExp(escaped, "i") },
+      { content: new RegExp(escaped, "i") },
     ];
   }
 
@@ -57,20 +58,19 @@ export const getBlogBySlug = asyncHandler(async (req, res) => {
 export const createBlog = asyncHandler(async (req, res) => {
   const body = { ...req.body };
 
-  // Parse JSON/Arrays if sent as string
-  if (typeof body.tags === "string") {
-    body.tags = JSON.parse(body.tags);
-  }
-  if (typeof body.seo === "string") {
-    body.seo = JSON.parse(body.seo);
+  // Safely parse JSON/Arrays if sent as string from multipart form
+  try {
+    if (typeof body.tags === "string") body.tags = JSON.parse(body.tags);
+    if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
+  } catch {
+    res.status(400);
+    throw new Error("Invalid JSON in form fields (tags, seo)");
   }
 
   // Handle file upload
-  let thumbnail = "";
   if (req.file) {
-    thumbnail = await uploadImage(req.file, "blog_thumbnails");
+    body.thumbnail = await uploadImage(req.file, "blog_thumbnails");
   }
-  body.thumbnail = thumbnail || body.thumbnail;
 
   const blog = await Blog.create(body);
 
@@ -84,7 +84,7 @@ export const createBlog = asyncHandler(async (req, res) => {
 // @route   PUT /api/blogs/:id
 // @access  Private/Admin
 export const updateBlog = asyncHandler(async (req, res) => {
-  let blog = await Blog.findById(req.params.id);
+  const blog = await Blog.findById(req.params.id);
 
   if (!blog) {
     res.status(404);
@@ -93,28 +93,26 @@ export const updateBlog = asyncHandler(async (req, res) => {
 
   const body = { ...req.body };
 
-  if (typeof body.tags === "string") {
-    body.tags = JSON.parse(body.tags);
-  }
-  if (typeof body.seo === "string") {
-    body.seo = JSON.parse(body.seo);
+  // Safely parse JSON/Arrays if sent as string from multipart form
+  try {
+    if (typeof body.tags === "string") body.tags = JSON.parse(body.tags);
+    if (typeof body.seo === "string") body.seo = JSON.parse(body.seo);
+  } catch {
+    res.status(400);
+    throw new Error("Invalid JSON in form fields (tags, seo)");
   }
 
   if (req.file) {
     body.thumbnail = await uploadImage(req.file, "blog_thumbnails");
   }
-  if (body.title) {
-    body.slug = slugify(body.title, { lower: true, strict: true });
-  }
 
-  blog = await Blog.findByIdAndUpdate(req.params.id, body, {
-    new: true,
-    runValidators: true,
-  });
+  // Use .set() + .save() so the pre-save slug hook fires on title change
+  blog.set(body);
+  const updatedBlog = await blog.save();
 
   res.status(200).json({
     success: true,
-    data: blog,
+    data: updatedBlog,
   });
 });
 

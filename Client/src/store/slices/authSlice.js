@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const token = localStorage.getItem("token");
-const savedUser = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : null;
+// Safe localStorage reader — won't crash in test/SSR environments or on corrupt data
+const loadFromStorage = () => {
+  try {
+    return {
+      token: localStorage.getItem("token") || null,
+      user: JSON.parse(localStorage.getItem("user") || "null"),
+    };
+  } catch {
+    return { token: null, user: null };
+  }
+};
+
+const { token, user: savedUser } = loadFromStorage();
 
 const initialState = {
   user: savedUser,
